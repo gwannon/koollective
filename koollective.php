@@ -51,13 +51,16 @@ add_shortcode('kollective_jornadas', function ($atts) {
     <p><?php printf(__("%d jornadas", 'koollective'), $my_query->found_posts); ?></p>
     <div>
       <?php if ( $my_query->have_posts() ) { ?>
-        <?php while ( $my_query->have_posts() ) { $my_query->the_post(); $post_id = get_the_id(); ?>
+        <?php while ( $my_query->have_posts() ) { $my_query->the_post(); $post_id = get_the_id(); 
+            $local = get_post(get_post_meta($post_id, "_jornada_local", true)); ?>
             <div style="--bgimage: url(<?php echo wp_get_attachment_image_url(get_post_thumbnail_id($post_id), 'medium'); ?>);">
                 <div>
                   <h2><?php the_title(); ?></h2>
                   <?php the_content(); ?>
                   <p><?php echo get_post_meta($post_id, "_jornada_fechainicio", true); ?></p>
                   <p><?php echo get_post_meta($post_id, "_jornada_fechafin", true); ?></p>
+                  <p><a href='<?php echo get_post_meta($local->ID, "_local_linkgooglemap", true); ?>' target="_blank"><?php echo $local->post_title; ?></a></p>
+                  <p><?php echo get_post_meta($local->ID, "_local_direccion", true); ?></p>
                 </div>
                 <div>
                   

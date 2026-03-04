@@ -21,12 +21,14 @@ function koollective_jornada_create_post_type() {
 	$args = array(
 		'labels'        => $labels,
 		'description'   => __( 'Añadir nueva jornada', 'koollective' ),
-		'public'        => true,
+		'public'        => false,
+    'show_ui'       => true,
 		'menu_position' => 200,
 		'query_var' 	=> true,
 		'supports'      => array( 'title', 'editor', 'thumbnail', /*'excerpt',*/ 'revisions' /*, 'page-attributes'*/ ),
-		'rewrite'	    => array( 'slug' => 'jornadas', 'with_front' => false),
-		'query_var'	    => true,
+		//'rewrite'	    => array( 'slug' => 'jornadas', 'with_front' => false),
+		'rewrite'	    => false,
+    'query_var'	    => true,
 		'has_archive' 	=> false,
 		'hierarchical'	=> true,
 	);
