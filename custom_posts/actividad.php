@@ -77,6 +77,9 @@ function koollective_get_actividad_custom_fields() {
     'jornada' => [
       'titulo' => __( 'Jornada', 'koollective' ), 'tipo' => 'select', 'valores' =>  koollective_get_actividad_jornadas()
 		],
+    'maxinscripciones' => [
+      'titulo' => __( 'Insscripciones máximas', 'koollective' ), 'tipo' => 'number'
+		],
   ];
 	return $fields;
 }
