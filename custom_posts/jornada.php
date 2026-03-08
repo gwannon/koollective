@@ -101,9 +101,34 @@ function koollective_jornada_set_custom_edit_columns($columns) {
 function koollective_jornada_custom_column( $column ) {
   global $post;
   if ($column == 'local') {
-  
+    $local = get_post(get_post_meta($post->ID, "_jornada_local", true));
+    echo "<a href='".get_edit_post_link($local->ID)."'>".$local->post_title."</a>";
   } else if ($column == 'actividades') {
-  
+    $args = [
+      'post_type' => 'actividad',
+      'posts_per_page' => -1,
+      'post_status' => 'publish',
+      'suppress_filters' => false,
+      'meta_key' => '_actividad_fechahora',
+      'orderby' => 'meta_value',
+      'meta_type' => 'DATE',
+      'order' => 'ASC',
+      'meta_query' => [
+        [
+          'key' => '_actividad_jornada',
+          'value' => $post->ID,
+          'compare' => '='
+        ]
+      ]
+    ];
+    $actividades = get_posts($args);
+    if(count($actividades) > 0) {
+      foreach($actividades as $actividad) {
+        echo "<a href='".get_edit_post_link($actividad->ID)."'>".$actividad->post_title."</a><br/>";
+      }
+    }
+
+    $actividades = get_posts($args);
   } else if ($column == 'fechainicio') {
     echo get_post_meta($post->ID, "_jornada_fechainicio", true);
   } else if ($column == 'fechafin') {

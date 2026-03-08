@@ -16,6 +16,7 @@
 
 //flush_rewrite_rules(true);
 
+define ("INSCRIPTION_PAGE_ID", 54);
 
 //Cargamos librerias
 include_once(dirname(__FILE__)."/custom_posts/custom_posts.php");
@@ -91,6 +92,7 @@ add_shortcode('kollective_jornadas', function ($atts) {
                         <h4><?php echo $actividad->post_title; ?></h4>
                         <p><?php echo get_post_meta($actividad->ID, "_actividad_fechahora", true); ?></p>
                         <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
+                        <a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>"><?php _e("Inscribirse", 'koollective'); ?></a>
                       </div>
                   <?php } } ?>
                 </div>
@@ -171,4 +173,117 @@ add_shortcode('kollective_jornadas', function ($atts) {
   <?php return ob_get_clean(); // fin del nivel actual de buffer
 });
 
+add_shortcode('kollective_inscripcion', function ($atts) {
+  ob_start(); 
+  if(isset($_REQUEST['actividad']) && is_numeric($_REQUEST['actividad'])) { 
+    $actividad = get_post($_REQUEST['actividad']); 
+    
+    /* TODO
+      * Chequear que haya espacios libres, sino sacar mensaje de que entran en lista de espera.
+      * Chequear que no haya pasado
+    */
+    
+    ?>
+    <h2><?php echo $actividad->post_title; ?></h2>
+    <p><?php echo get_post_meta($actividad->ID, "_actividad_fechahora", true); ?></p>
+    <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
+    <?php echo apply_filters("the_content", $actividad->post_content); ?>
+    <form id="forminscripcion">
+      <label>
+        <?php _e("Nombre", 'koollective'); ?> *
+        <input type="text" name="nombre" value="" placeholder="<?php _e("Introduce tu nombre", 'koollective'); ?>" required />
+      </label>
+      <label>
+        <?php _e("Apellidos", 'koollective'); ?> *
+        <input type="text" name="apellidos" value="" placeholder="<?php _e("Introduce tus apellidos", 'koollective'); ?>" required />
+      </label>
+      <label>
+        <?php _e("DNI", 'koollective'); ?> *
+        <input type="text" name="dni" value="" placeholder="<?php _e("Introduce tus DNI con letra", 'koollective'); ?>" maxlength="9" required />
+      </label>
+      <label>
+        <?php _e("Email", 'koollective'); ?> *
+        <input type="email" name="email" value="" placeholder="<?php _e("Introduce tu email", 'koollective'); ?>" required />
+      </label>
+      <label>
+        <?php _e("Teléfono", 'koollective'); ?> *
+        <input type="text" name="telefono" value="" placeholder="<?php _e("Introduce tu telefono", 'koollective'); ?>" maxlength="9" required />
+      </label>
+      <label>
+        <?php _e("Fecha de nacimiento", 'koollective'); ?>
+        <input type="date" name="fechanacimiento" value="" />
+      </label>
+      <label>
+        <?php _e("Dirección", 'koollective'); ?>
+        <input type="text" name="direccion" value="" placeholder="<?php _e("Introduce tu dirección", 'koollective'); ?>" />
+      </label>
+      <label>
+        <?php _e("Código postal", 'koollective'); ?> *
+        <input type="text" name="codigopostal" value="" placeholder="<?php _e("Introduce tu código postal", 'koollective'); ?>" maxlength="5" required />
+      </label>
+      <label>
+        <?php _e("Cíudad", 'koollective'); ?> *
+        <input type="text" name="ciudad" value="" placeholder="<?php _e("Introduce tu ciudad", 'koollective'); ?>" required />
+      </label>
+      <label>
+        <?php _e("¿Cómo conoció el evento?", 'koollective'); ?> *
+        <textarea name="comoconocioevento" placeholder="<?php _e("Máximo 120 caracteres.", 'koollective'); ?>" maxlength="10" required></textarea>
+      </label>
+      <label>
+        <?php _e("¿Ha participado en otros eventos?", 'koollective'); ?><br/>
+        <input type="radio" name="hasparticipadootroevento" value="Sí" checked="checked" /> Sí <br/>
+        <input type="radio" name="hasparticipadootroevento" value="No" /> No
+      </label>
+      <label>
+        <?php _e("¿En qué tienda Koopera compras habitualmente?", 'koollective'); ?> *
+        <input type="text" name="tiendacompras" value="" placeholder="<?php _e("Introduce el nombre de la tienda", 'koollective'); ?>" required />
+      </label>
+      <label class="doble">
+        <?php _e("¿Qué te interesa más de nuestras actividades?", 'koollective'); ?><br/>
+        <input type="checkbox" name="interes" value="Moda sostenible" /> Moda sostenible<br/>
+        <input type="checkbox" name="interes" value="Economía circular" /> Economía circular<br/>
+        <input type="checkbox" name="interes" value="Eventos / encuentros" /> Eventos / encuentros<br/>
+        <input type="checkbox" name="interes" value="Talleres / formación" /> Talleres / formación<br/>
+        <input type="checkbox" name="interes" value="Segunda mano / vintage" /> Segunda mano / vintage    
+      </label>
+      <label>        
+        <input type="checkbox" name="aceptorecibirinformacion" value="Acepto recibir información" />
+        <?php _e("Acepto recibir información sobre actividades, eventos y novedades de Koopera.", 'koollective'); ?>
+      </label>
+      <label>
+        <?php _e("¿Cómo prefieres recibir información?", 'koollective'); ?><br/>
+        <input type="checkbox" name="interes" value="Email" /> Email<br/>
+        <input type="checkbox" name="interes" value="WhatsApp" /> WhatsApp<br/>
+        <input type="checkbox" name="interes" value="SMS" /> SMS
+      </label>
+      <button type="submit" name="inscripcion"><?php _e("Inscribirse", 'koollective'); ?></button>
+    </form>
+    <style>
+      #forminscripcion {
+        max-width: 600px;
+        border: 1px solid red;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
 
+      #forminscripcion > label {
+        display: block;
+        width: calc(50% - 10px);
+      }
+
+      #forminscripcion > label.doble {
+        width: 100%;
+      }
+
+      #forminscripcion > label > *:is(input[type=text],input[type=date],input[type=email],textarea) {
+        width: 100%;
+      }
+
+      #forminscripcion > button {
+        width: 100%;
+      }
+    </style>
+  <?php }
+  return ob_get_clean(); // fin del nivel actual de buffer
+});

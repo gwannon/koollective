@@ -91,7 +91,7 @@ function koollective_get_actividad_custom_fields() {
 function koollective_actividad_set_custom_edit_columns($columns) {
   $columns['fechahora'] = __( 'Fecha y hora', 'koollective');
 	$columns['jornada'] = __( 'Jornada', 'koollective');
-	$columns['local'] = __( 'Local', 'koollective');
+	$columns['inscripciones'] = __( 'Inscripciones', 'koollective');
   $columns['imagen'] = __( 'Imagen', 'koollective');
   unset($columns['date']);
   return $columns;
@@ -102,9 +102,10 @@ function koollective_actividad_custom_column( $column ) {
   if ($column == 'fechahora') {
      echo get_post_meta($post->ID, "_actividad_fechahora", true);
   } else if ($column == 'jornada') {
-
-  } else if ($column == 'local') {
-
+    $jornada = get_post(get_post_meta($post->ID, "_actividad_jornada", true));
+    echo "<a href='".get_edit_post_link($jornada->ID)."'>".$jornada->post_title."</a><br/>";
+  } else if ($column == 'inscripciones') {
+    echo "0/".get_post_meta($post->ID, "_actividad_maxinscripciones", true);
   } else if ($column == 'imagen') {
 		if(has_post_thumbnail($post->ID)) echo "<img src='".get_the_post_thumbnail_url($post->ID, 'thumbnail')."' alt='' style='width: 150px; height: 150px;' />";
   }

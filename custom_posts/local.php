@@ -68,35 +68,24 @@ function koollective_get_local_custom_fields() {
 //Columnas, filtros y ordenaciones ---------------
 // ------------------------------------------------
 function koollective_local_set_custom_edit_columns($columns) {
-	$columns['ciudad'] = __( 'Línea de investigación', 'koollective');
-	$columns['relacionlocal'] = __( 'Tipo de relación', 'koollective');
+	$columns['ciudad'] = __( 'Ciudad', 'koollective');
  	$columns['imagen'] = __( 'Imagen', 'koollective');
-  	//unset($columns['date']);
-  	return $columns;
+  unset($columns['date']);
+  return $columns;
 }
 
 function koollective_local_custom_column( $column ) {
   global $post;
   if ($column == 'ciudad') {
     $terms = get_the_terms( $post->ID, 'ciudad'); 
-	if(is_array($terms)) {
-		$sorted_terms = sort_terms_hierarchically( $terms );
-		$string = array();
-		foreach($sorted_terms as $term) {
-		$string[] = $term->name;
-		}
-		if(count($string) > 0) echo implode (", ", $string);
-	}
-  } else  if ($column == 'relacionlocal') {
-    $terms = get_the_terms( $post->ID, 'relacionlocal'); 
-	if(is_array($terms)) {
-		$sorted_terms = sort_terms_hierarchically( $terms );
-		$string = array();
-		foreach($sorted_terms as $term) {
-		$string[] = $term->name;
-		}
-		if(count($string) > 0) echo implode (", ", $string);
-	}
+    if(is_array($terms)) {
+      $sorted_terms = sort_terms_hierarchically( $terms );
+      $string = array();
+      foreach($sorted_terms as $term) {
+      $string[] = $term->name;
+      }
+      if(count($string) > 0) echo implode (", ", $string);
+    }
   } else if ($column == 'imagen') {
 		if(has_post_thumbnail($post->ID)) echo "<img src='".get_the_post_thumbnail_url($post->ID, 'thumbnail')."' alt='' style='width: 150px; height: 150px;' />";
   }
@@ -111,7 +100,7 @@ function koollective_local_post_by_ciudad_taxonomy() {
 		// $info_taxonomy = get_taxonomy($taxonomy);
 		wp_dropdown_categories(array(
 			'hierarchical' 		=> 1,
-			'show_option_all' => __( 'Mostrar todas las lineas de investigación', 'koollective' ),
+			'show_option_all' => __( 'Mostrar todas las ciudades', 'koollective' ),
 			'taxonomy'        => $taxonomy,
 			'name'            => $taxonomy,
 			'orderby'         => 'name',
