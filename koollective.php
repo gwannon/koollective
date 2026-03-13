@@ -177,85 +177,165 @@ add_shortcode('kollective_inscripcion', function ($atts) {
   ob_start(); 
   if(isset($_REQUEST['actividad']) && is_numeric($_REQUEST['actividad'])) { 
     $actividad = get_post($_REQUEST['actividad']); 
+
+    $form = [];
+    foreach($_REQUEST as $key => $value) {
+      if(is_array($value)) {
+        $form[$key] = $value;
+      } else $form[$key] = trim(strip_tags($value));
+    }
+
+    if(count($form) > 1) {
+      $errors = [];
+
+      //Errores
+      if($form['nombre'] == '') {
+        $errors[] = __("Debes de rellenar el campo «Nombre».", 'koollective');
+      }
+
+      if($form['apellidos'] == '') {
+        $errors[] = __("Debes de rellenar el campo «Apellidos».", 'koollective');
+      }
+
+      if($form['dni'] == '') {
+        $errors[] = __("Debes de rellenar el campo «DNI».", 'koollective');
+      } else if (!preg_match('/^[0-9]{8}[A-Z]$/', $form['dni'])) {
+        $errors[] = __("El «Teléfono» no tiene el formato adecuado. Solo deben ser 8 números y una letra en mayúsculas.", 'koollective');
+      }
     
-    /* TODO
-      * Chequear que haya espacios libres, sino sacar mensaje de que entran en lista de espera.
-      * Chequear que no haya pasado
-    */
+      if($form['email'] == '') {
+        $errors[] = __("Debes de rellenar el campo «Email».", 'koollective');
+      } else if (!filter_var($form['email'], FILTER_VALIDATE_EMAIL)) {
+        $errors[] = __("El «Email» no tiene el formato adecuado.", 'koollective');
+      }
+    
+      if($form['telefono'] == '') {
+        $errors[] = __("Debes de rellenar el campo «Teléfono».", 'koollective');
+      } else if (!preg_match("/^[0-9]{9}$/" ,$form['telefono'])) {
+        $errors[] = __("El «Teléfono» no tiene el formato adecuado. Solo deben ser 9 números, sin letras, ni espacios, ni simbolos.", 'koollective');
+      }
+
+      if($form['codigopostal'] == '') {
+        $errors[] = __("Debes de rellenar el campo «Código postal».", 'koollective');
+      } else if (!preg_match("/^[0-9]{5}$/" ,$form['codigopostal'])) {
+        $errors[] = __("El «Código postal» no tiene el formato adecuado. Solo deben ser 5 números.", 'koollective');
+      } 
+    
+      if($form['ciudad'] == '') {
+        $errors[] = __("Debes de rellenar el campo «Ciudad».", 'koollective');
+      } 
+
+      if($form['comoconocioevento'] == '') {
+        $errors[] = __("Debes de rellenar el campo «¿Cómo conoció el evento?».", 'koollective');
+      } 
+
+      if($form['hasparticipadootroevento'] == '') {
+        $errors[] = __("Debes de rellenar el campo «¿Ha participado en otros eventos?».", 'koollective');
+      }
+
+      if($form['aceptopoliticaprivacidad'] == '') {
+        $errors[] = __("Debes aceptar la política de privacidad.", 'koollective');
+      } 
+      
+      if(count($errors) > 0) { ?>
+        <p style="border: 1px solid red; baackround-color: #cecece; padding: 20px;">
+          <?php echo implode("<br/>", $errors); ?>
+        </p>
+      <?php } else {
+        if(kollective_can_inscript($dni, $actividad)) {
+
+          //Miramos si se mete en la lista de asistentes o en la lista de espera
+
+          //Insertamos el usuaario en el base de datos
+
+          //Mandamos email al admin
+
+        } else { $form = kollective_reset_form($form); ?>
+          <p style="border: 1px solid red; baackround-color: #cecece; padding: 20px;">
+            <?php _e("Lo sentimos, has superado el limite de actividades a las que te puedes apuntar de esta jornada.", 'koollective'); ?>
+          </p>
+        <?php }
+      }
+    }
     
     ?>
     <h2><?php echo $actividad->post_title; ?></h2>
     <p><?php echo get_post_meta($actividad->ID, "_actividad_fechahora", true); ?></p>
     <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
     <?php echo apply_filters("the_content", $actividad->post_content); ?>
-    <form id="forminscripcion">
+    <form id="forminscripcion" method="post">
+      <input type="hidden" name="actividad" value="<?= $form['actividad']; ?>" />
       <label>
         <?php _e("Nombre", 'koollective'); ?> *
-        <input type="text" name="nombre" value="" placeholder="<?php _e("Introduce tu nombre", 'koollective'); ?>" required />
+        <input type="text" name="nombre" value="<?=(isset($form['nombre']) ? $form['nombre'] : "") ?>" placeholder="<?php _e("Introduce tu nombre", 'koollective'); ?>" required />
       </label>
       <label>
         <?php _e("Apellidos", 'koollective'); ?> *
-        <input type="text" name="apellidos" value="" placeholder="<?php _e("Introduce tus apellidos", 'koollective'); ?>" required />
+        <input type="text" name="apellidos" value="<?=(isset($form['apellidos']) ? $form['apellidos'] : "") ?>" placeholder="<?php _e("Introduce tus apellidos", 'koollective'); ?>" required />
       </label>
       <label>
         <?php _e("DNI", 'koollective'); ?> *
-        <input type="text" name="dni" value="" placeholder="<?php _e("Introduce tus DNI con letra", 'koollective'); ?>" maxlength="9" required />
+        <input type="text" name="dni" value="<?=(isset($form['dni']) ? $form['dni'] : "") ?>" placeholder="<?php _e("Introduce tu DNI con letra", 'koollective'); ?>" maxlength="9" required />
       </label>
       <label>
         <?php _e("Email", 'koollective'); ?> *
-        <input type="email" name="email" value="" placeholder="<?php _e("Introduce tu email", 'koollective'); ?>" required />
+        <input type="email" name="email" value="<?=(isset($form['email']) ? $form['email'] : "") ?>" placeholder="<?php _e("Introduce tu email", 'koollective'); ?>" required />
       </label>
       <label>
         <?php _e("Teléfono", 'koollective'); ?> *
-        <input type="text" name="telefono" value="" placeholder="<?php _e("Introduce tu telefono", 'koollective'); ?>" maxlength="9" required />
+        <input type="text" name="telefono" value="<?=(isset($form['telefono']) ? $form['telefono'] : "") ?>" placeholder="<?php _e("Introduce tu telefono", 'koollective'); ?>" maxlength="9" required />
       </label>
       <label>
         <?php _e("Fecha de nacimiento", 'koollective'); ?>
-        <input type="date" name="fechanacimiento" value="" />
+        <input type="date" name="fechanacimiento" value="<?=(isset($form['fechanacimiento']) ? $form['fechanacimiento'] : "") ?>" />
       </label>
       <label>
         <?php _e("Dirección", 'koollective'); ?>
-        <input type="text" name="direccion" value="" placeholder="<?php _e("Introduce tu dirección", 'koollective'); ?>" />
+        <input type="text" name="direccion" value="<?=(isset($form['direccion']) ? $form['direccion'] : "") ?>" placeholder="<?php _e("Introduce tu dirección", 'koollective'); ?>" />
       </label>
       <label>
         <?php _e("Código postal", 'koollective'); ?> *
-        <input type="text" name="codigopostal" value="" placeholder="<?php _e("Introduce tu código postal", 'koollective'); ?>" maxlength="5" required />
+        <input type="text" name="codigopostal" value="<?=(isset($form['codigopostal']) ? $form['codigopostal'] : "") ?>" placeholder="<?php _e("Introduce tu código postal", 'koollective'); ?>" maxlength="5" required />
       </label>
       <label>
         <?php _e("Cíudad", 'koollective'); ?> *
-        <input type="text" name="ciudad" value="" placeholder="<?php _e("Introduce tu ciudad", 'koollective'); ?>" required />
+        <input type="text" name="ciudad" value="<?=(isset($form['ciudad']) ? $form['ciudad'] : "") ?>" placeholder="<?php _e("Introduce tu ciudad", 'koollective'); ?>" required />
       </label>
       <label>
         <?php _e("¿Cómo conoció el evento?", 'koollective'); ?> *
-        <textarea name="comoconocioevento" placeholder="<?php _e("Máximo 120 caracteres.", 'koollective'); ?>" maxlength="10" required></textarea>
+        <textarea name="comoconocioevento" placeholder="<?php _e("Máximo 120 caracteres.", 'koollective'); ?>" maxlength="120" required><?=(isset($form['comoconocioevento']) ? $form['comoconocioevento'] : "") ?></textarea>
       </label>
       <label>
         <?php _e("¿Ha participado en otros eventos?", 'koollective'); ?><br/>
-        <input type="radio" name="hasparticipadootroevento" value="Sí" checked="checked" /> Sí <br/>
-        <input type="radio" name="hasparticipadootroevento" value="No" /> No
+        <label><input type="radio" name="hasparticipadootroevento" value="Sí" checked="checked" /> <?php _e("Sí", 'koollective'); ?></label><br/>
+        <label><input type="radio" name="hasparticipadootroevento" value="No" /> <?php _e("No", 'koollective'); ?></label>
       </label>
       <label>
         <?php _e("¿En qué tienda Koopera compras habitualmente?", 'koollective'); ?> *
-        <input type="text" name="tiendacompras" value="" placeholder="<?php _e("Introduce el nombre de la tienda", 'koollective'); ?>" required />
+        <input type="text" name="tiendacompras" value="<?=(isset($form['ciudad']) ? $form['ciudad'] : "") ?>" placeholder="<?php _e("Introduce el nombre de la tienda", 'koollective'); ?>" required />
       </label>
-      <label class="doble">
+      <div class="doble">
         <?php _e("¿Qué te interesa más de nuestras actividades?", 'koollective'); ?><br/>
-        <input type="checkbox" name="interes" value="Moda sostenible" /> Moda sostenible<br/>
-        <input type="checkbox" name="interes" value="Economía circular" /> Economía circular<br/>
-        <input type="checkbox" name="interes" value="Eventos / encuentros" /> Eventos / encuentros<br/>
-        <input type="checkbox" name="interes" value="Talleres / formación" /> Talleres / formación<br/>
-        <input type="checkbox" name="interes" value="Segunda mano / vintage" /> Segunda mano / vintage    
-      </label>
+        <label><input type="checkbox" name="interes[]" value="Moda sostenible"<?=(isset($form['interes']) && in_array("Moda sostenible", $form['interes']) ? " checked='checked'" : "") ?> /> <?php _e("Moda sostenible", 'koollective'); ?></label><br/>
+        <label><input type="checkbox" name="interes[]" value="Economía circular"<?=(isset($form['interes']) && in_array("Economía circular", $form['interes']) ? " checked='checked'" : "") ?> /> <?php _e("Economía circular", 'koollective'); ?></label><br/>
+        <label><input type="checkbox" name="interes[]" value="Eventos / encuentros"<?=(isset($form['interes']) && in_array("Eventos / encuentros", $form['interes']) ? " checked='checked'" : "") ?> /> <?php _e("Eventos / encuentros", 'koollective'); ?></label><br/>
+        <label><input type="checkbox" name="interes[]" value="Talleres / formación"<?=(isset($form['interes']) && in_array("Talleres / formación", $form['interes']) ? " checked='checked'" : "") ?> /> <?php _e("Talleres / formación", 'koollective'); ?></label><br/>
+        <label><input type="checkbox" name="interes[]" value="Segunda mano / vintage"<?=(isset($form['interes']) && in_array("Segunda mano / vintage", $form['interes']) ? " checked='checked'" : "") ?> /> <?php _e("Segunda mano / vintage", 'koollective'); ?></label> 
+      </div>
       <label>        
-        <input type="checkbox" name="aceptorecibirinformacion" value="Acepto recibir información" />
+        <input type="checkbox" name="aceptorecibirinformacion"<?=(isset($form['aceptorecibirinformacion']) ? " checked='checked'" : "") ?> value="Acepto recibir información" />
         <?php _e("Acepto recibir información sobre actividades, eventos y novedades de Koopera.", 'koollective'); ?>
       </label>
-      <label>
+      <div>
         <?php _e("¿Cómo prefieres recibir información?", 'koollective'); ?><br/>
-        <input type="checkbox" name="interes" value="Email" /> Email<br/>
-        <input type="checkbox" name="interes" value="WhatsApp" /> WhatsApp<br/>
-        <input type="checkbox" name="interes" value="SMS" /> SMS
-      </label>
+        <label><input type="checkbox" name="metodorecibirinformacion[]" value="Email"<?=(isset($form['metodorecibirinformacion']) && in_array("Email", $form['metodorecibirinformacion']) ? " checked='checked'" : "") ?> /> <?php _e("Email", 'koollective'); ?></label><br/>
+        <label><input type="checkbox" name="metodorecibirinformacion[]" value="WhatsApp"<?=(isset($form['metodorecibirinformacion']) && in_array("WhatsApp", $form['metodorecibirinformacion']) ? " checked='checked'" : "") ?> /> <?php _e("WhatsApp", 'koollective'); ?></label><br/>
+        <label><input type="checkbox" name="metodorecibirinformacion[]" value="SMS"<?=(isset($form['metodorecibirinformacion']) && in_array("SMS", $form['metodorecibirinformacion']) ? " checked='checked'" : "") ?> /> <?php _e("SMS", 'koollective'); ?></label>
+      </div>
+      <div class="doble">       
+        <label><input type="checkbox" name="aceptopoliticaprivacidad" value="Acepto la politica de privacidad." required />
+        <?php _e("Acepto la politica de privacidad.", 'koollective'); ?></label>
+      </div>
       <button type="submit" name="inscripcion"><?php _e("Inscribirse", 'koollective'); ?></button>
     </form>
     <style>
@@ -267,12 +347,13 @@ add_shortcode('kollective_inscripcion', function ($atts) {
         flex-wrap: wrap;
       }
 
-      #forminscripcion > label {
+      #forminscripcion > label,
+      #forminscripcion > div {
         display: block;
         width: calc(50% - 10px);
       }
 
-      #forminscripcion > label.doble {
+      #forminscripcion > div.doble {
         width: 100%;
       }
 
@@ -287,3 +368,14 @@ add_shortcode('kollective_inscripcion', function ($atts) {
   <?php }
   return ob_get_clean(); // fin del nivel actual de buffer
 });
+
+function kollective_can_inscript($dni, $actividad) {
+  return true;
+}
+
+function kollective_reset_form($form) {
+  $actividad = $form['actividad'];
+  unset ($form);
+  $form['actividad'] = $actividad;
+  return $form;
+}
