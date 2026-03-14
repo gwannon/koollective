@@ -17,10 +17,12 @@
 /* 
  *
  * TODO:
- * Borrar inscripciones
- *
+ * 
+ * Diseño de formulario                              | RESPUESTA ALBERTO
+ * Diseño grid                                       | RESPUESTA ALBERTO
+ * 
  * Chequear algoritmo DNI/NIE                        | RESPUESTA CLIENTE
- * Texto email usuario (inscrito o lista de espera)  | TIENE QUE MANDAR CLIENTE
+ * Texto email usuario (inscrito o lista de espera)  | RESPUESTA CLIENTE
  * ¿Las lista de espera cuenta como inscripción?     | RESPUESTA CLIENTE
  *
  */
@@ -475,7 +477,7 @@ function kollective_send_admin_email($form, $actividad) { //TODO
   $subject = "Nuevo inscrito en ".$actividad->post_title;
   $message = "<a href='".get_edit_post_link($actividad->ID)."'>".$actividad->post_title."</a><br/><br/><br/><ul>";
   foreach($form as $key => $value) {
-    $message .="<li><b>".$key.":</b> ".$value."</li>";
+    $message .="<li><b>".$key.":</b> ".(is_array($value) ? implode(", ", $value) : $value)."</li>";
   }
   $message .="</ul>";
   $emails = explode(",", INSCRIPTION_ADMIN_EMAIL);

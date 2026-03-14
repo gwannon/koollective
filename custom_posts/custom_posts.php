@@ -14,7 +14,7 @@ function koollective_show_custom_fields() { //Show box
 		<div>
       <?php foreach ($fields as $field => $datos) { ?>
         <?php if(!isset($datos['is']) || (isset($datos['is']) && has_term($datos['is']['id'], $datos['is']['taxonomy'], $post->ID))) { ?>
-          <?php if($datos['tipo'] != 'gallery' && $datos['tipo'] != 'separator' && $datos['tipo'] != 'links' && $datos['tipo'] != 'positions' && $datos['tipo'] != 'inscritos') { ?><div style="width: calc(50% - 10px); float: left; padding: 5px;"><?php } else { ?><div style="width: calc(100% - 10px); float: left; padding: 5px;"><?php } ?>
+          <?php if($datos['tipo'] != 'separator' && $datos['tipo'] != 'inscritos') { ?><div style="width: calc(50% - 10px); float: left; padding: 5px;"><?php } else { ?><div style="width: calc(100% - 10px); float: left; padding: 5px;"><?php } ?>
             <?php if($datos['tipo'] == 'separator') { ?><h3 style="background-color: #000; color: #fff; padding: 5px; margin: 0px;"><?php echo $datos['titulo']; ?></h3><?php } else { ?><p><b><?php echo $datos['titulo']; ?></b></p><?php } ?>
             <?php if($datos['tipo'] == 'text') { ?>
               <input  type="text" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" style="width: 100%;" name="_<?php echo $type; ?>_<?php echo $field; ?>" value="<?php echo str_replace('"', '\"', get_post_meta( $post->ID, '_'.$type.'_'.$field, true )); ?>"<?php echo (isset($datos['placeholder']) ? " placeholder='".$datos['placeholder']."'" : "" ); ?>/>
@@ -73,7 +73,7 @@ function koollective_show_custom_fields() { //Show box
                 </table>
               </div>
               <br/>
-              <a href="/wp-admin/admin-ajax.php?action=koollective-export&actividad=<?php echo $post->ID; ?>" target="_blank" class="button"><?php _e("Exportar a CSV", 'koollective'); ?></a>
+              <?php if(count($inscritos) > 0) { ?><a href="/wp-admin/admin-ajax.php?action=koollective-export&actividad=<?php echo $post->ID; ?>" target="_blank" class="button"><?php _e("Exportar a CSV", 'koollective'); ?></a><?php } else { ?><?php _e("No hay inscritos.", 'koollective'); ?><?php } ?>
               <style>
                 table#inscritos thead tr th {
                   background-color: black;
@@ -98,47 +98,18 @@ function koollective_save_custom_fields( $post_id ) { //Save changes
   $fields = koollective_get_custom_fields ($type);
 	foreach ($fields as $field => $datos) {
 		$label = '_'.$type.'_'.$field;
-    if ($datos['tipo'] == 'tags') {
-      delete_post_meta( $post_id, $label);
-      $temp = explode("_", substr($label, 1));
-      if(isset($_POST[$label]) && $_POST[$label] != '') {
-        foreach(explode(",", $_POST[$label]) as $tag) {
-          $args = [
-              'post_type'      => $temp[1],
-              'posts_per_page' => 1,
-              'post_name__in'  => [$tag],
-              'suppress_filters' => false,
-          ];
-          $q = get_posts( $args );
-          add_post_meta($post_id, $label, $q[0]->ID);
+    if ($datos['tipo'] == 'inscritos') {
+      $label2 = $label.'_borrar';
+      if(isset($_POST[$label2]) && is_array($_POST[$label2]) && count($_POST[$label2]) > 0) {
+        $newinscritos = [];
+        $inscritos = get_post_meta($post_id, $label, true);
+        //print_r($inscritos);
+        foreach($inscritos as $inscrito) {
+          if(!in_array($inscrito['dni'], $_POST[$label2])) $newinscritos[] = $inscrito;
         }
+        update_post_meta($post_id, $label, $newinscritos);
+        //print_r($newinscritos);
       }
-    } else if ($datos['tipo'] == 'links') {
-      $links = [];
-      if(isset($_POST[$label]) && is_array($_POST[$label])) {
-        foreach ($_POST[$label] as $link) {
-          if ($link['link'] != '' && $link['text'] != '') $links[] = $link;
-        }
-      }
-      update_post_meta( $post_id, $label, $links);
-    } else if ($datos['tipo'] == 'positions') {
-      $positions = [];
-      //print_pre($_POST[$label]);
-      if(isset($_POST[$label]) && is_array($_POST[$label])) {
-        foreach ($_POST[$label] as $position) {
-          if ($position['position'] != '' && $position['investigador'] != '') $positions[] = $position;
-        }
-      }
-      //print_pre($positions); die;
-      update_post_meta( $post_id, $label, $positions);
-    } else if ($datos['tipo'] == 'gallery') {
-      $images = [];
-      if(isset($_POST[$label]) && is_array($_POST[$label])) {
-        foreach ($_POST[$label] as $image_id) {
-          if ($image_id > 0) $images[] = $image_id;
-        }
-      }
-      update_post_meta( $post_id, $label, $images);
     } else if (isset($_POST[$label])) update_post_meta( $post_id, $label, $_POST[$label]);
 		else if (!isset($_POST[$label]) && $datos['tipo'] == 'checkbox') delete_post_meta( $post_id, $label);
     else if (!isset($_POST[$label]) && $datos['tipo'] == 'multiple') delete_post_meta( $post_id, $label);
