@@ -52,7 +52,7 @@ function koollective_show_custom_fields() { //Show box
                     </tr>
                   </thead>
                   <tbody>
-                    <?php $counter = 1; foreach($inscritos as $inscrito) { unset($inscrito['actividad']); ?> 
+                    <?php $counter = 1; if(is_array($inscritos) && count($inscritos) > 0) { foreach($inscritos as $inscrito) { unset($inscrito['actividad']); ?> 
                       <tr>
                         <th><?php echo $counter; ?></th>
                         <td><?php echo $inscrito['nombre']; ?></td>
@@ -68,12 +68,12 @@ function koollective_show_custom_fields() { //Show box
                           <td colspan="8" style="text-align: center; font-weight: 700; background-color: black; color: white;"><?php _e("Lista de espera", 'koollective'); ?></td>
                         </tr>
                       <?php } ?>
-                    <?php $counter++; } ?>
+                    <?php $counter++; } } ?>
                   </tbody>
                 </table>
               </div>
               <br/>
-              <?php if(count($inscritos) > 0) { ?><a href="/wp-admin/admin-ajax.php?action=koollective-export&actividad=<?php echo $post->ID; ?>" target="_blank" class="button"><?php _e("Exportar a CSV", 'koollective'); ?></a><?php } else { ?><?php _e("No hay inscritos.", 'koollective'); ?><?php } ?>
+              <?php if(is_array($inscritos) && count($inscritos) > 0) { ?><a href="/wp-admin/admin-ajax.php?action=koollective-export&actividad=<?php echo $post->ID; ?>" target="_blank" class="button"><?php _e("Exportar a CSV", 'koollective'); ?></a><?php } else { ?><?php _e("No hay inscritos.", 'koollective'); ?><?php } ?>
               <style>
                 table#inscritos thead tr th {
                   background-color: black;

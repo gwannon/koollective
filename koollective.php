@@ -352,11 +352,11 @@ add_shortcode('kollective_inscripcion', function ($atts) {
         <label><input type="checkbox" name="interes[]" value="Talleres / formación"<?=(isset($form['interes']) && in_array("Talleres / formación", $form['interes']) ? " checked='checked'" : "") ?> /> <?php _e("Talleres / formación", 'koollective'); ?></label><br/>
         <label><input type="checkbox" name="interes[]" value="Segunda mano / vintage"<?=(isset($form['interes']) && in_array("Segunda mano / vintage", $form['interes']) ? " checked='checked'" : "") ?> /> <?php _e("Segunda mano / vintage", 'koollective'); ?></label> 
       </div>
-      <label>        
+      <label class="doble">        
         <input type="checkbox" name="aceptorecibirinformacion"<?=(isset($form['aceptorecibirinformacion']) ? " checked='checked'" : "") ?> value="Acepto recibir información" />
         <?php _e("Acepto recibir información sobre actividades, eventos y novedades de Koopera.", 'koollective'); ?>
       </label>
-      <div>
+      <div id="metodorecibirinformacion" class="doble" <?=(isset($form['aceptorecibirinformacion']) ? "" : " style='display: none;'") ?>>
         <?php _e("¿Cómo prefieres recibir información?", 'koollective'); ?><br/>
         <label><input type="checkbox" name="metodorecibirinformacion[]" value="Email"<?=(isset($form['metodorecibirinformacion']) && in_array("Email", $form['metodorecibirinformacion']) ? " checked='checked'" : "") ?> /> <?php _e("Email", 'koollective'); ?></label><br/>
         <label><input type="checkbox" name="metodorecibirinformacion[]" value="WhatsApp"<?=(isset($form['metodorecibirinformacion']) && in_array("WhatsApp", $form['metodorecibirinformacion']) ? " checked='checked'" : "") ?> /> <?php _e("WhatsApp", 'koollective'); ?></label><br/>
@@ -368,6 +368,17 @@ add_shortcode('kollective_inscripcion', function ($atts) {
       </div>
       <button type="submit" name="inscripcion"><?php _e("Inscribirse", 'koollective'); ?></button>
     </form>
+    <script>
+      let aceptorecibirinformacion = document.querySelector('input[name="aceptorecibirinformacion"]');
+      let metodorecibirinformacion = document.querySelector('#metodorecibirinformacion');
+      aceptorecibirinformacion.addEventListener('input', function (event) {
+        if(aceptorecibirinformacion.checked) {
+          metodorecibirinformacion.style.display = 'block';
+        } else {
+          metodorecibirinformacion.style.display = 'none';
+        }
+      });
+    </script>
     <style>
       #forminscripcion {
         max-width: 800px;
@@ -382,6 +393,7 @@ add_shortcode('kollective_inscripcion', function ($atts) {
         width: calc(50% - 10px);
       }
 
+      #forminscripcion > label.doble,
       #forminscripcion > div.doble {
         width: 100%;
       }
