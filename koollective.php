@@ -21,7 +21,6 @@
 * Administración de inscripciones
 * Exportación de CSV
 * Chequear algoritmo DNI
-* Cerrar inscripción si es una actividad pasada
 *
 */
 
@@ -98,9 +97,11 @@ add_shortcode('kollective_jornadas', function ($atts) {
                   <?php foreach($actividades as $actividad) { ?>
                     <div style="--bgimage: url(<?php echo wp_get_attachment_image_url(get_post_thumbnail_id($actividad->ID), 'medium'); ?>);">
                       <h4><?php echo $actividad->post_title; ?></h4>
-                      <p><?php echo get_post_meta($actividad->ID, "_actividad_fechahora", true); ?></p>
+                      <p><?php $fecha = get_post_meta($actividad->ID, "_actividad_fechahora", true); echo str_replace("T", " - ", $fecha); ?></p>
                       <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
-                      <a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>"><?php _e("Inscribirse", 'koollective'); ?></a>
+                      <?php if(strtotime("now") < strtotime($fecha)) { ?>
+                        <a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>"><?php _e("Inscribirse", 'koollective'); ?></a>
+                      <?php } ?>
                     </div>
                 <?php } } ?></div>
             </div>
@@ -185,9 +186,10 @@ add_shortcode('kollective_inscripcion', function ($atts) {
   if(isset($_REQUEST['actividad']) && is_numeric($_REQUEST['actividad'])) { 
     $actividad = get_post($_REQUEST['actividad']); ?>
     <h2><?php echo $actividad->post_title; ?></h2>
-    <p><?php echo get_post_meta($actividad->ID, "_actividad_fechahora", true); ?></p>
+    <p><?php $fecha = get_post_meta($actividad->ID, "_actividad_fechahora", true); echo str_replace("T", " - ", $fecha); ?></p>
     <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
     <?php echo apply_filters("the_content", $actividad->post_content); ?>
+    <?php if(strtotime("now") >= strtotime($fecha)) { return ob_get_clean(); } // inscripción cerrada ?>
     <?php if(kollective_is_waitlist($actividad)) { ?>
       <p style="border: 1px solid red; background-color: #fcbebe; padding: 20px;">
         <?php _e("El numero de asistentes está completo. Si te inscribes en esta actividad, entrarás en la lista de espera. Si se liberá espacio, nos pondremos en contacto contigo para avisarte.", 'koollective'); ?>
