@@ -12,10 +12,9 @@ function koollective_show_custom_fields() { //Show box
   $type = get_post_type($post->ID);
   $fields = koollective_get_custom_fields ($type); ?>
 		<div>
-			
       <?php foreach ($fields as $field => $datos) { ?>
         <?php if(!isset($datos['is']) || (isset($datos['is']) && has_term($datos['is']['id'], $datos['is']['taxonomy'], $post->ID))) { ?>
-          <?php if($datos['tipo'] != 'gallery' && $datos['tipo'] != 'separator' && $datos['tipo'] != 'links' && $datos['tipo'] != 'positions') { ?><div style="width: calc(50% - 10px); float: left; padding: 5px;"><?php } else { ?><div style="width: calc(100% - 10px); float: left; padding: 5px;"><?php } ?>
+          <?php if($datos['tipo'] != 'gallery' && $datos['tipo'] != 'separator' && $datos['tipo'] != 'links' && $datos['tipo'] != 'positions' && $datos['tipo'] != 'inscritos') { ?><div style="width: calc(50% - 10px); float: left; padding: 5px;"><?php } else { ?><div style="width: calc(100% - 10px); float: left; padding: 5px;"><?php } ?>
             <?php if($datos['tipo'] == 'separator') { ?><h3 style="background-color: #000; color: #fff; padding: 5px; margin: 0px;"><?php echo $datos['titulo']; ?></h3><?php } else { ?><p><b><?php echo $datos['titulo']; ?></b></p><?php } ?>
             <?php if($datos['tipo'] == 'text') { ?>
               <input  type="text" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" style="width: 100%;" name="_<?php echo $type; ?>_<?php echo $field; ?>" value="<?php echo str_replace('"', '\"', get_post_meta( $post->ID, '_'.$type.'_'.$field, true )); ?>"<?php echo (isset($datos['placeholder']) ? " placeholder='".$datos['placeholder']."'" : "" ); ?>/>
@@ -66,6 +65,49 @@ function koollective_show_custom_fields() { //Show box
               <?php foreach($datos['valores'] as $key => $value) { ?>
                 <input type="checkbox" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" name="_<?php echo $type; ?>_<?php echo $field; ?>[]" value="<?php echo $key; ?>" <?php if(is_array($results) && in_array($key, $results)) { echo "checked='checked'"; } ?> /> <?php echo $value; ?><br/>
               <?php } ?>
+            <?php } else if ($datos['tipo'] == 'inscritos') { ?>
+              <?php $inscritos = get_post_meta($post->ID, '_'.$type.'_inscritos', true); ?>
+              <div style="overflow: auto;">
+                <table id="inscritos" border="0" cellpadding="10" width="100%">
+                  <thead>
+                    <tr>
+                      <th><?php _e("Nombre", 'koollective'); ?></th>
+                      <th><?php _e("Apellidos", 'koollective'); ?></th>
+                      <th><?php _e("DNI", 'koollective'); ?></th>
+                      <th><?php _e("Email", 'koollective'); ?></th>
+                      <th><?php _e("Teléfono", 'koollective'); ?></th>
+                      <th><?php _e("Ciudad", 'koollective'); ?></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php $counter = 1; foreach($inscritos as $inscrito) { unset($inscrito['actividad']); ?> 
+                      <tr>
+                        <td><?php echo $inscrito['nombre']; ?></td>
+                        <td><?php echo $inscrito['apellidos']; ?></td>
+                        <td><?php echo $inscrito['dni']; ?></td>
+                        <td><?php echo $inscrito['email']; ?></td>
+                        <td><?php echo $inscrito['telefono']; ?></td>
+                        <td><?php echo $inscrito['ciudad']; ?></td>
+                      </tr>
+                      <?php if($counter == get_post_meta($post->ID, '_'.$type.'_maxinscripciones', true)) { ?>
+                        <tr style="">
+                          <td colspan="6" style="text-align: center; font-weight: 700; background-color: black; color: white;"><?php _e("Lista de espera", 'koollective'); ?></td>
+                        </tr>
+                      <?php } ?>
+                    <?php $counter++; } ?>
+                  </tbody>
+                </table>
+              </div>
+              <style>
+                table#inscritos thead tr th {
+                  background-color: black;
+                  color: white;
+                }
+
+                table#inscritos tbody tr:nth-of-type(odd) td {
+                  background-color: #cecece;
+                }
+              </style>
             <?php } ?>
           </div>
         <?php } ?>

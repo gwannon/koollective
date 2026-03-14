@@ -14,6 +14,17 @@
  * WordPress 6.9
  */
 
+/* TODO:
+*
+* Enviar email admin
+* Enviar email usuario (inscrito o lista de espera)
+* Administración de inscripciones
+* Exportación de CSV
+* Chequear algoritmo DNI
+* Cerrar inscripción si es una actividad pasada
+*
+*/
+
 //flush_rewrite_rules(true);
 
 define ("INSCRIPTION_PAGE_ID", 54);
@@ -24,7 +35,6 @@ include_once(dirname(__FILE__)."/custom_posts/jornada.php");
 include_once(dirname(__FILE__)."/custom_posts/actividad.php");
 include_once(dirname(__FILE__)."/custom_posts/local.php");
 include_once(dirname(__FILE__)."/custom_posts/taxonomies.php");
-
 
 add_shortcode('kollective_jornadas', function ($atts) {
   ob_start(); ?>
@@ -48,7 +58,7 @@ add_shortcode('kollective_jornadas', function ($atts) {
           ]
         ]
       ];
-    $my_query = new WP_Query( $args ); ?>
+      $my_query = new WP_Query( $args ); ?>
     <p><?php printf(__("%d jornadas", 'koollective'), $my_query->found_posts); ?></p>
     <div>
       <?php if ( $my_query->have_posts() ) { ?>
@@ -63,39 +73,36 @@ add_shortcode('kollective_jornadas', function ($atts) {
                   <p><a href='<?php echo get_post_meta($local->ID, "_local_linkgooglemap", true); ?>' target="_blank"><?php echo $local->post_title; ?></a></p>
                   <p><?php echo get_post_meta($local->ID, "_local_direccion", true); ?></p>
                 </div>
-                <div>
-                  
-                  <?php
-                    $args = [
-                      'post_type' => 'actividad',
-                      'posts_per_page' => -1,
-                      'post_status' => 'publish',
-                      'suppress_filters' => false,
-                      'meta_key' => '_actividad_fechahora',
-                      'orderby' => 'meta_value',
-                      'meta_type' => 'DATE',
-                      'order' => 'ASC',
-                      'meta_query' => [
-                        [
-                          'key' => '_actividad_jornada',
-                          'value' => $post_id,
-                          'compare' => '='
-                        ]
+                <div><?php
+                  $args = [
+                    'post_type' => 'actividad',
+                    'posts_per_page' => -1,
+                    'post_status' => 'publish',
+                    'suppress_filters' => false,
+                    'meta_key' => '_actividad_fechahora',
+                    'orderby' => 'meta_value',
+                    'meta_type' => 'DATE',
+                    'order' => 'ASC',
+                    'meta_query' => [
+                      [
+                        'key' => '_actividad_jornada',
+                        'value' => $post_id,
+                        'compare' => '='
                       ]
-                    ];
+                    ]
+                  ];
 
-                    $actividades = get_posts($args);
-                    if(count($actividades) > 0) { ?>
-                    <h3><?php _e("Actividades", 'koollective'); ?></h3>
-                    <?php foreach($actividades as $actividad) { ?>
-                      <div style="--bgimage: url(<?php echo wp_get_attachment_image_url(get_post_thumbnail_id($actividad->ID), 'medium'); ?>);">
-                        <h4><?php echo $actividad->post_title; ?></h4>
-                        <p><?php echo get_post_meta($actividad->ID, "_actividad_fechahora", true); ?></p>
-                        <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
-                        <a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>"><?php _e("Inscribirse", 'koollective'); ?></a>
-                      </div>
-                  <?php } } ?>
-                </div>
+                  $actividades = get_posts($args);
+                  if(count($actividades) > 0) { ?>
+                  <h3><?php _e("Actividades", 'koollective'); ?></h3>
+                  <?php foreach($actividades as $actividad) { ?>
+                    <div style="--bgimage: url(<?php echo wp_get_attachment_image_url(get_post_thumbnail_id($actividad->ID), 'medium'); ?>);">
+                      <h4><?php echo $actividad->post_title; ?></h4>
+                      <p><?php echo get_post_meta($actividad->ID, "_actividad_fechahora", true); ?></p>
+                      <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
+                      <a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>"><?php _e("Inscribirse", 'koollective'); ?></a>
+                    </div>
+                <?php } } ?></div>
             </div>
         <?php } ?>
       <?php } ?>
@@ -176,14 +183,23 @@ add_shortcode('kollective_jornadas', function ($atts) {
 add_shortcode('kollective_inscripcion', function ($atts) {
   ob_start(); 
   if(isset($_REQUEST['actividad']) && is_numeric($_REQUEST['actividad'])) { 
-    $actividad = get_post($_REQUEST['actividad']); 
-
-    $form = [];
+    $actividad = get_post($_REQUEST['actividad']); ?>
+    <h2><?php echo $actividad->post_title; ?></h2>
+    <p><?php echo get_post_meta($actividad->ID, "_actividad_fechahora", true); ?></p>
+    <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
+    <?php echo apply_filters("the_content", $actividad->post_content); ?>
+    <?php if(kollective_is_waitlist($actividad)) { ?>
+      <p style="border: 1px solid red; background-color: #fcbebe; padding: 20px;">
+        <?php _e("El numero de asistentes está completo. Si te inscribes en esta actividad, entrarás en la lista de espera. Si se liberá espacio, nos pondremos en contacto contigo para avisarte.", 'koollective'); ?>
+      </p>
+    <?php } ?>
+    <?php $form = [];
     foreach($_REQUEST as $key => $value) {
       if(is_array($value)) {
         $form[$key] = $value;
       } else $form[$key] = trim(strip_tags($value));
     }
+    unset($form['inscripcion']);
 
     if(count($form) > 1) {
       $errors = [];
@@ -200,7 +216,7 @@ add_shortcode('kollective_inscripcion', function ($atts) {
       if($form['dni'] == '') {
         $errors[] = __("Debes de rellenar el campo «DNI».", 'koollective');
       } else if (!preg_match('/^[0-9]{8}[A-Z]$/', $form['dni'])) {
-        $errors[] = __("El «Teléfono» no tiene el formato adecuado. Solo deben ser 8 números y una letra en mayúsculas.", 'koollective');
+        $errors[] = __("El «DNI» no tiene el formato adecuado. Solo deben ser 8 números y una letra en mayúsculas.", 'koollective');
       }
     
       if($form['email'] == '') {
@@ -238,31 +254,33 @@ add_shortcode('kollective_inscripcion', function ($atts) {
       } 
       
       if(count($errors) > 0) { ?>
-        <p style="border: 1px solid red; baackround-color: #cecece; padding: 20px;">
+        <p style="border: 1px solid red; background-color: #cecece; padding: 20px;">
           <?php echo implode("<br/>", $errors); ?>
         </p>
       <?php } else {
-        if(kollective_can_inscript($dni, $actividad)) {
-
-          //Miramos si se mete en la lista de asistentes o en la lista de espera
-
-          //Insertamos el usuaario en el base de datos
-
-          //Mandamos email al admin
-
+        if(!kollective_is_inscripted($form, $actividad)) {
+          if(kollective_can_inscript($form['dni'], $actividad)) { //Miramos si se puede inscribirse o no
+            if(kollective_inscript($form, $actividad)) { ?>
+                <p style="border: 1px solid green; background-color: #a8fa98; padding: 20px;">
+                  <?php _e("Estás inscrito en esta actividad. Recibirás un email de confirmación con los datos de la actividad.", 'koollective'); ?>
+                </p>
+              <?php //Mandamos emails
+              kollective_send_admin_email($form, $actividad);
+              kollective_send_user_email($form, $actividad);
+              $form = kollective_reset_form($form);
+            }
+          } else { $form = kollective_reset_form($form); ?>
+            <p style="border: 1px solid red; background-color: #fcbebe; padding: 20px;">
+              <?php _e("Lo sentimos, has superado el limite de actividades a las que te puedes apuntar de esta jornada.", 'koollective'); ?>
+            </p>
+          <?php }
         } else { $form = kollective_reset_form($form); ?>
-          <p style="border: 1px solid red; baackround-color: #cecece; padding: 20px;">
-            <?php _e("Lo sentimos, has superado el limite de actividades a las que te puedes apuntar de esta jornada.", 'koollective'); ?>
-          </p>
+            <p style="border: 1px solid red; background-color: #fcbebe; padding: 20px;">
+              <?php _e("Lo sentimos, ya estás inscrito en esta actividad con anterioridad. Revisa tu correo para encontrar tu confirmación. Puede que esté en la carpeta de SPAM.", 'koollective'); ?>
+            </p>
         <?php }
       }
-    }
-    
-    ?>
-    <h2><?php echo $actividad->post_title; ?></h2>
-    <p><?php echo get_post_meta($actividad->ID, "_actividad_fechahora", true); ?></p>
-    <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
-    <?php echo apply_filters("the_content", $actividad->post_content); ?>
+    } ?>
     <form id="forminscripcion" method="post">
       <input type="hidden" name="actividad" value="<?= $form['actividad']; ?>" />
       <label>
@@ -340,8 +358,7 @@ add_shortcode('kollective_inscripcion', function ($atts) {
     </form>
     <style>
       #forminscripcion {
-        max-width: 600px;
-        border: 1px solid red;
+        max-width: 800px;
         display: flex;
         gap: 20px;
         flex-wrap: wrap;
@@ -370,6 +387,60 @@ add_shortcode('kollective_inscripcion', function ($atts) {
 });
 
 function kollective_can_inscript($dni, $actividad) {
+  $jornada = get_post(get_post_meta($actividad->ID, "_actividad_jornada", true));
+  $maxinscripciones = get_post_meta($jornada->ID, "_jornada_maxinscripciones", true);
+  $inscripciones = 0;
+  $args = [
+    'post_type' => 'actividad',
+    'posts_per_page' => -1,
+    'post_status' => 'publish',
+    'suppress_filters' => false,
+    'meta_key' => '_actividad_fechahora',
+    'orderby' => 'meta_value',
+    'meta_type' => 'DATE',
+    'order' => 'ASC',
+    'meta_query' => [
+      [
+        'key' => '_actividad_jornada',
+        'value' => $jornada->ID,
+        'compare' => '='
+      ]
+    ]
+  ];
+  $actividades = get_posts($args);
+  if(count($actividades) > 0) {
+    foreach($actividades as $actividad) {
+      $inscritos = get_post_meta($actividad->ID, "_actividad_inscritos", true);
+      if(is_array($inscritos) && count($inscritos) > 0) {
+        foreach($inscritos as $inscrito) {
+          if($inscrito['dni'] == $dni) $inscripciones++;
+        }
+      }
+    }
+  }
+  if($inscripciones >= $maxinscripciones) return false;
+  else return true;
+}
+
+function kollective_is_inscripted($form, $actividad) {
+  $inscritos = get_post_meta($actividad->ID, "_actividad_inscritos", true);
+  if(is_array($inscritos) && count($inscritos) > 0) {
+    foreach($inscritos as $inscrito) {
+      if($inscrito['dni'] == $form['dni']) return true;
+    }
+  }
+  return false;
+}
+
+function kollective_inscript($form, $actividad) {
+  $inscritos = get_post_meta($actividad->ID, "_actividad_inscritos", true);
+  if(is_array($inscritos) && count($inscritos) > 0) {
+    $inscritos[] = $form;
+  } else {
+    $inscritos = [];
+    $inscritos[] = $form;
+  }
+  update_post_meta($actividad->ID, "_actividad_inscritos", $inscritos);
   return true;
 }
 
@@ -378,4 +449,20 @@ function kollective_reset_form($form) {
   unset ($form);
   $form['actividad'] = $actividad;
   return $form;
+}
+
+function kollective_is_waitlist($actividad) {
+  $maxinscripciones = get_post_meta($actividad->ID, "_actividad_maxinscripciones", true);
+  $inscritos = get_post_meta($actividad->ID, "_actividad_inscritos", true);
+  if(is_array($inscritos) && count($inscritos) >= $maxinscripciones) return true;
+  else return false;
+
+}
+
+function kollective_send_admin_email($form, $actividad) { //TODO
+  return true;
+}
+
+function kollective_send_user_email($form, $actividad) { //TODO
+  return true;
 }

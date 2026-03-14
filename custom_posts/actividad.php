@@ -80,7 +80,10 @@ function koollective_get_actividad_custom_fields() {
       'titulo' => __( 'Jornada', 'koollective' ), 'tipo' => 'select', 'valores' =>  koollective_get_actividad_jornadas()
 		],
     'maxinscripciones' => [
-      'titulo' => __( 'Insscripciones máximas', 'koollective' ), 'tipo' => 'number'
+      'titulo' => __( 'Inscripciones máximas', 'koollective' ), 'tipo' => 'number'
+		],
+    'inscritos' => [
+      'titulo' => __( 'Inscritos', 'koollective' ), 'tipo' => 'inscritos'
 		],
   ];
 	return $fields;
