@@ -24,27 +24,8 @@ function koollective_show_custom_fields() { //Show box
               <input type="date" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" style="width: 50%;" name="_<?php echo $type; ?>_<?php echo $field; ?>" value="<?php echo get_post_meta( $post->ID, '_'.$type.'_'.$field, true ); ?>" />
             <?php }  else if($datos['tipo'] == 'datetime') { ?>
               <input type="datetime-local" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" style="width: 50%;" name="_<?php echo $type; ?>_<?php echo $field; ?>" value="<?php echo get_post_meta( $post->ID, '_'.$type.'_'.$field, true ); ?>" />
-            <?php }else if($datos['tipo'] == 'time') { ?>
-              <input type="time" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" style="width: 50%;" name="_<?php echo $type; ?>_<?php echo $field; ?>" value="<?php echo get_post_meta( $post->ID, '_'.$type.'_'.$field, true ); ?>" />
             <?php } else if($datos['tipo'] == 'number') { ?>
               <input type="number" step="1" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" style="width: 50%;" name="_<?php echo $type; ?>_<?php echo $field; ?>" value="<?php echo get_post_meta( $post->ID, '_'.$type.'_'.$field, true ); ?>" />
-            <?php } else if($datos['tipo'] == 'code' || $datos['tipo'] == 'simpletextarea') { ?>
-              <textarea class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" style="width: 100%;" rows="5" name="_<?php echo $type; ?>_<?php echo $field; ?>"<?php echo (isset($datos['placeholder']) ? " placeholder='".$datos['placeholder']."'" : "" ); ?>><?php echo get_post_meta( $post->ID, '_'.$type.'_'.$field, true ); ?></textarea>
-            <?php } else if($datos['tipo'] == 'hidden') { ?>
-              <input disabled="disabled" type="text" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" style="width: 50%;" name="_<?php echo $type; ?>_<?php echo $field; ?>" value="<?php echo get_post_meta( $post->ID, '_'.$type.'_'.$field, true ); ?>" />
-            <?php } else if($datos['tipo'] == 'image') { ?>
-              <input type="text" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="input_<?php echo $type; ?>_<?php echo $field; ?>" style="width: 80%;" name="_<?php echo $type; ?>_<?php echo $field; ?>" value='<?php echo get_post_meta( $post->ID, '_'.$type.'_'.$field, true ); ?>' />
-              <a href="#" id="button_media_<?php echo $field; ?>" class="button insert-media add_media" data-editor="input_<?php echo $type; ?>_<?php echo $field; ?>" title="<?php _e("Añadir fichero", 'koollective'); ?>"><span class="wp-media-buttons-icon"></span> <?php _e("Añadir fichero", 'koollective'); ?></a>
-              <script>
-                jQuery(document).ready(function () {			
-                  jQuery("#input_<?php echo $type; ?>_<?php echo $field; ?>").change(function() {
-                    a_imgurlar = jQuery(this).val().match(/<a href=\"([^\"]+)\"/);
-                    img_imgurlar = jQuery(this).val().match(/<img[^>]+src=\"([^\"]+)\"/);
-                    if(img_imgurlar !==null ) jQuery(this).val(img_imgurlar[1]);
-                    else  jQuery(this).val(a_imgurlar[1]);
-                  });
-                });
-              </script>
             <?php } else if($datos['tipo'] == 'textarea') { ?>
               <?php $settings = array( 'media_buttons' => true, 'quicktags' => true, 'textarea_rows' => 5 ); ?>
               <?php wp_editor( get_post_meta( $post->ID, '_'.$type.'_'.$field, true ), '_'.$type.'_'.$field, $settings ); ?>
@@ -54,57 +35,52 @@ function koollective_show_custom_fields() { //Show box
                   <option value="<?php echo $key; ?>"<?php if ($key == get_post_meta( $post->ID, '_'.$type.'_'.$field, true )) echo " selected='selected'"; ?>><?php echo $value; ?></option>
                 <?php } ?>	
               </select>
-            <?php } else if ($datos['tipo'] == 'multiple') {  ?>
-              <select name="_<?php echo $type; ?>_<?php echo $field; ?>[]" multiple="multiple" style="width: 100%;">
-                <?php foreach($datos['valores'] as $key => $value) { ?>
-                  <option value="<?php echo $key; ?>"<?php if (in_array($key, get_post_meta( $post->ID, '_'.$type.'_'.$field, true ))) echo " selected='selected'"; ?>><?php echo $value; ?></option>
-                <?php } ?>	
-              </select>
-            <?php } else if ($datos['tipo'] == 'checkbox') { ?>
-              <?php $results = get_post_meta( $post->ID, '_'.$type.'_'.$field, true ); ?>
-              <?php foreach($datos['valores'] as $key => $value) { ?>
-                <input type="checkbox" class="_<?php echo $type; ?>_<?php echo $field; ?>" id="_<?php echo $type; ?>_<?php echo $field; ?>" name="_<?php echo $type; ?>_<?php echo $field; ?>[]" value="<?php echo $key; ?>" <?php if(is_array($results) && in_array($key, $results)) { echo "checked='checked'"; } ?> /> <?php echo $value; ?><br/>
-              <?php } ?>
             <?php } else if ($datos['tipo'] == 'inscritos') { ?>
               <?php $inscritos = get_post_meta($post->ID, '_'.$type.'_inscritos', true); ?>
               <div style="overflow: auto;">
                 <table id="inscritos" border="0" cellpadding="10" width="100%">
                   <thead>
                     <tr>
+                      <th><?php _e("#", 'koollective'); ?></th>
                       <th><?php _e("Nombre", 'koollective'); ?></th>
                       <th><?php _e("Apellidos", 'koollective'); ?></th>
                       <th><?php _e("DNI", 'koollective'); ?></th>
                       <th><?php _e("Email", 'koollective'); ?></th>
                       <th><?php _e("Teléfono", 'koollective'); ?></th>
                       <th><?php _e("Ciudad", 'koollective'); ?></th>
+                      <th><?php _e("Borrar", 'koollective'); ?></th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php $counter = 1; foreach($inscritos as $inscrito) { unset($inscrito['actividad']); ?> 
                       <tr>
+                        <th><?php echo $counter; ?></th>
                         <td><?php echo $inscrito['nombre']; ?></td>
                         <td><?php echo $inscrito['apellidos']; ?></td>
                         <td><?php echo $inscrito['dni']; ?></td>
-                        <td><?php echo $inscrito['email']; ?></td>
-                        <td><?php echo $inscrito['telefono']; ?></td>
+                        <td><a hre="mailto:<?php echo $inscrito['email']; ?>"><?php echo $inscrito['email']; ?></a></td>
+                        <td><a hre="tel:<?php echo $inscrito['telefono']; ?>"><?php echo $inscrito['telefono']; ?></a></td>
                         <td><?php echo $inscrito['ciudad']; ?></td>
+                        <th><input type="checkbox" name="_<?php echo $type; ?>_inscritos_borrar[]" value="<?php echo $inscrito['dni']; ?>"></th>
                       </tr>
                       <?php if($counter == get_post_meta($post->ID, '_'.$type.'_maxinscripciones', true)) { ?>
                         <tr style="">
-                          <td colspan="6" style="text-align: center; font-weight: 700; background-color: black; color: white;"><?php _e("Lista de espera", 'koollective'); ?></td>
+                          <td colspan="8" style="text-align: center; font-weight: 700; background-color: black; color: white;"><?php _e("Lista de espera", 'koollective'); ?></td>
                         </tr>
                       <?php } ?>
                     <?php $counter++; } ?>
                   </tbody>
                 </table>
               </div>
+              <br/>
+              <a href="/wp-admin/admin-ajax.php?action=koollective-export&actividad=<?php echo $post->ID; ?>" target="_blank" class="button"><?php _e("Exportar a CSV", 'koollective'); ?></a>
               <style>
                 table#inscritos thead tr th {
                   background-color: black;
                   color: white;
                 }
 
-                table#inscritos tbody tr:nth-of-type(odd) td {
+                table#inscritos tbody tr:nth-of-type(odd) *:is(td, th) {
                   background-color: #cecece;
                 }
               </style>
@@ -117,8 +93,6 @@ function koollective_show_custom_fields() { //Show box
 }
 
 function koollective_save_custom_fields( $post_id ) { //Save changes
-
-  //print_pre($_REQUEST); die;
 	global $wpdb;
   $type = get_post_type($post_id);
   $fields = koollective_get_custom_fields ($type);
@@ -169,14 +143,4 @@ function koollective_save_custom_fields( $post_id ) { //Save changes
 		else if (!isset($_POST[$label]) && $datos['tipo'] == 'checkbox') delete_post_meta( $post_id, $label);
     else if (!isset($_POST[$label]) && $datos['tipo'] == 'multiple') delete_post_meta( $post_id, $label);
 	}
-}
-
-// Libs ----------------------------------------
-function sort_terms_hierarchically($terms) {
-	usort($terms, "cmp");
-	return $terms;
-}
-
-function cmp($a, $b) {
-	return strcmp($a->parent, $b->parent);
 }

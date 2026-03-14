@@ -14,19 +14,21 @@
  * WordPress 6.9
  */
 
-/* TODO:
-*
-* Enviar email admin
-* Enviar email usuario (inscrito o lista de espera)
-* Administración de inscripciones
-* Exportación de CSV
-* Chequear algoritmo DNI
-*
-*/
+/* 
+ *
+ * TODO:
+ * Borrar inscripciones
+ *
+ * Chequear algoritmo DNI/NIE                        | RESPUESTA CLIENTE
+ * Texto email usuario (inscrito o lista de espera)  | TIENE QUE MANDAR CLIENTE
+ * ¿Las lista de espera cuenta como inscripción?     | RESPUESTA CLIENTE
+ *
+ */
 
 //flush_rewrite_rules(true);
 
-define ("INSCRIPTION_PAGE_ID", 54);
+define ("INSCRIPTION_PAGE_ID", get_option("_koollective_inscription_page_id"));
+define ("INSCRIPTION_ADMIN_EMAIL", get_option("_koollective_admin_email"));
 
 //Cargamos librerias
 include_once(dirname(__FILE__)."/custom_posts/custom_posts.php");
@@ -34,6 +36,7 @@ include_once(dirname(__FILE__)."/custom_posts/jornada.php");
 include_once(dirname(__FILE__)."/custom_posts/actividad.php");
 include_once(dirname(__FILE__)."/custom_posts/local.php");
 include_once(dirname(__FILE__)."/custom_posts/taxonomies.php");
+include_once(dirname(__FILE__)."/admin.php");
 
 add_shortcode('kollective_jornadas', function ($atts) {
   ob_start(); ?>
@@ -190,7 +193,7 @@ add_shortcode('kollective_inscripcion', function ($atts) {
     <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
     <?php echo apply_filters("the_content", $actividad->post_content); ?>
     <?php if(strtotime("now") >= strtotime($fecha)) { return ob_get_clean(); } // inscripción cerrada ?>
-    <?php if(kollective_is_waitlist($actividad)) { ?>
+    <?php $waitlist = false; if(kollective_is_waitlist($actividad)) { $waitlist = true; ?>
       <p style="border: 1px solid red; background-color: #fcbebe; padding: 20px;">
         <?php _e("El numero de asistentes está completo. Si te inscribes en esta actividad, entrarás en la lista de espera. Si se liberá espacio, nos pondremos en contacto contigo para avisarte.", 'koollective'); ?>
       </p>
@@ -264,11 +267,16 @@ add_shortcode('kollective_inscripcion', function ($atts) {
           if(kollective_can_inscript($form['dni'], $actividad)) { //Miramos si se puede inscribirse o no
             if(kollective_inscript($form, $actividad)) { ?>
                 <p style="border: 1px solid green; background-color: #a8fa98; padding: 20px;">
-                  <?php _e("Estás inscrito en esta actividad. Recibirás un email de confirmación con los datos de la actividad.", 'koollective'); ?>
+                  <?php if($waitlist) { ?>
+                    <?php _e("Estás inscrito en la lista de espera de esta actividad. Recibirás un email de confirmación con los datos de la actividad.", 'koollective'); ?>
+                  <?php } else { ?>
+                    <?php _e("Estás inscrito en esta actividad. Recibirás un email de confirmación con los datos de la actividad.", 'koollective'); ?>
+                  <?php } ?>
                 </p>
               <?php //Mandamos emails
               kollective_send_admin_email($form, $actividad);
-              kollective_send_user_email($form, $actividad);
+              if($waitlist) kollective_send_waitllist_user_email($form, $actividad);
+              else kollective_send_user_email($form, $actividad);
               $form = kollective_reset_form($form);
             }
           } else { $form = kollective_reset_form($form); ?>
@@ -353,8 +361,8 @@ add_shortcode('kollective_inscripcion', function ($atts) {
         <label><input type="checkbox" name="metodorecibirinformacion[]" value="SMS"<?=(isset($form['metodorecibirinformacion']) && in_array("SMS", $form['metodorecibirinformacion']) ? " checked='checked'" : "") ?> /> <?php _e("SMS", 'koollective'); ?></label>
       </div>
       <div class="doble">       
-        <label><input type="checkbox" name="aceptopoliticaprivacidad" value="Acepto la politica de privacidad." required />
-        <?php _e("Acepto la politica de privacidad.", 'koollective'); ?></label>
+        <label><input type="checkbox" name="aceptopoliticaprivacidad" value="Acepto la política de privacidad." required />
+        <?php _e("Acepto la política de privacidad.", 'koollective'); ?></label>
       </div>
       <button type="submit" name="inscripcion"><?php _e("Inscribirse", 'koollective'); ?></button>
     </form>
@@ -458,13 +466,77 @@ function kollective_is_waitlist($actividad) {
   $inscritos = get_post_meta($actividad->ID, "_actividad_inscritos", true);
   if(is_array($inscritos) && count($inscritos) >= $maxinscripciones) return true;
   else return false;
-
 }
 
 function kollective_send_admin_email($form, $actividad) { //TODO
-  return true;
+  $headers = [
+    'Content-Type: text/html; charset=UTF-8'
+  ];
+  $subject = "Nuevo inscrito en ".$actividad->post_title;
+  $message = "<a href='".get_edit_post_link($actividad->ID)."'>".$actividad->post_title."</a><br/><br/><br/><ul>";
+  foreach($form as $key => $value) {
+    $message .="<li><b>".$key.":</b> ".$value."</li>";
+  }
+  $message .="</ul>";
+  $emails = explode(",", INSCRIPTION_ADMIN_EMAIL);
+  foreach($emails as $email) {
+    wp_mail(trim($email), $subject, $message, $headers);
+  }
 }
 
 function kollective_send_user_email($form, $actividad) { //TODO
-  return true;
+  $headers = [
+    'Content-Type: text/html; charset=UTF-8'
+  ];
+  $subject = sprintf(__("Te has inscrito en la actividad «%s»", 'koollective'), $actividad->post_title);
+  $message = sprintf(__("Te has inscrito en la actividad «%s»", 'koollective'), $actividad->post_title);
+  wp_mail($form['email'], $subject, $message, $headers);
+}
+
+function kollective_send_waitllist_user_email($form, $actividad) { //TODO
+  $headers = [
+    'Content-Type: text/html; charset=UTF-8'
+  ];
+  $subject = sprintf(__("Te has inscrito en la lista de espera de la actividad «%s»", 'koollective'), $actividad->post_title);
+  $message = sprintf(__("Te has inscrito en la lista de espera de la actividad «%s»", 'koollective'), $actividad->post_title);
+  wp_mail($form['email'], $subject, $message, $headers);
+}
+
+// ADMIN-AJAX exportar a csv
+// /wp-admin/admin-ajax.php?action=koollective-export&actividad=[actividad_id]
+add_action( 'wp_ajax_koollective-export', 'koollective_export_csv');
+
+function koollective_export_csv() {
+  if(isset($_REQUEST['actividad']) && is_numeric($_REQUEST['actividad'])) {
+    $actividad = get_post($_REQUEST['actividad']);
+    $maxinscripciones = get_post_meta($actividad->ID, '_actividad_maxinscripciones', true);
+    header("Content-Type: text/csv");
+    header("Content-Disposition: attachment; filename=".$actividad->post_name."_".date("Y-m-d_His").".csv");
+    $inscritos = get_post_meta($_REQUEST['actividad'], "_actividad_inscritos", true);
+    $csv = "Nombre,Apellidos,DNI,Email,Teléfono,Fecha de nacimiento,Dirección,Código postal,Ciudad,¿Cómo conoció el evento?,¿Ha participado en otros eventos?,¿En qué tienda Koopera compras habitualmente?,¿Qué te interesa más de nuestras actividades?,\"Acepto recibir información sobre actividades, eventos y novedades de Koopera.\",¿Cómo prefieres recibir información?\n";
+    $csv .= "INSCRITOS --------------------------------\n";
+    $counter = 1;
+    foreach($inscritos as $inscrito) {
+      $csv .= '"'.addslashes($inscrito['nombre']).'",';
+      $csv .= '"'.addslashes($inscrito['apellidos']).'",';
+      $csv .= $inscrito['dni'].",";
+      $csv .= $inscrito['email'].",";
+      $csv .= $inscrito['telefono'].",";
+      $csv .= (isset($inscrito['fechanacimiento']) ? $inscrito['fechanacimiento'] : "").",";
+      $csv .= (isset($inscrito['direccion']) ? '"'.addslashes($inscrito['direccion']).'"' : "").",";
+      $csv .= $inscrito['codigopostal'].",";
+      $csv .= '"'.addslashes($inscrito['ciudad']).'",';
+      $csv .= (isset($inscrito['comoconocioevento']) ? '"'.addslashes($inscrito['comoconocioevento']).'"' : "").",";
+      $csv .= $inscrito['hasparticipadootroevento'].",";
+      $csv .= '"'.addslashes($inscrito['tiendacompras']).'",';
+      $csv .= (isset($inscrito['interes']) && is_array($inscrito['interes']) ? implode("|", $inscrito['interes']) : "").",";
+      $csv .= (isset($inscrito['aceptorecibirinformacion']) ? $inscrito['aceptorecibirinformacion'] : "").",";
+      $csv .= (isset($inscrito['metodorecibirinformacion']) && is_array($inscrito['metodorecibirinformacion']) ? implode("|", $inscrito['metodorecibirinformacion']) : "").",";
+      $csv .= "\n";
+      if($counter == $maxinscripciones) $csv .= "LISTA DE ESPERA --------------------------------\n";
+      $counter++;
+    }
+    echo $csv;
+    wp_die();
+  }
 }

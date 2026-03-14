@@ -71,16 +71,16 @@ function koollective_get_actividad_custom_fields() {
 	//global $post;
 	$fields = [
     'resumen' => [
-        'titulo' => __( 'Resumen', 'koollective' ), 'tipo' => 'textarea'
+      'titulo' => __( 'Resumen', 'koollective' ), 'tipo' => 'textarea'
     ],
     'fechahora' => [
-            'titulo' => __( 'Fecha y hora', 'koollective' ), 'tipo' => 'datetime'
+      'titulo' => __( 'Fecha y hora', 'koollective' ), 'tipo' => 'datetime'
 		],
     'jornada' => [
       'titulo' => __( 'Jornada', 'koollective' ), 'tipo' => 'select', 'valores' =>  koollective_get_actividad_jornadas()
 		],
     'maxinscripciones' => [
-      'titulo' => __( 'Inscripciones máximas', 'koollective' ), 'tipo' => 'number'
+      'titulo' => __( 'Número de asistentes máximo', 'koollective' ), 'tipo' => 'number'
 		],
     'inscritos' => [
       'titulo' => __( 'Inscritos', 'koollective' ), 'tipo' => 'inscritos'
@@ -108,7 +108,12 @@ function koollective_actividad_custom_column( $column ) {
     $jornada = get_post(get_post_meta($post->ID, "_actividad_jornada", true));
     echo "<a href='".get_edit_post_link($jornada->ID)."'>".$jornada->post_title."</a><br/>";
   } else if ($column == 'inscripciones') {
-    echo "0/".get_post_meta($post->ID, "_actividad_maxinscripciones", true);
+
+    $inscritos = get_post_meta($post->ID, "_actividad_inscritos", true);
+    if(is_array($inscritos)) echo count($inscritos);
+    else echo "0";
+
+    echo "/".get_post_meta($post->ID, "_actividad_maxinscripciones", true);
   } else if ($column == 'imagen') {
 		if(has_post_thumbnail($post->ID)) echo "<img src='".get_the_post_thumbnail_url($post->ID, 'thumbnail')."' alt='' style='width: 150px; height: 150px;' />";
   }

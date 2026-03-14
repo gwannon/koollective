@@ -56,10 +56,7 @@ function koollective_get_local_custom_fields() {
     ],
     'linkgooglemap' => [
       'titulo' => __( 'URL a Google Maps', 'koollective' ), 'tipo' => 'link', 'placeholder' =>  __( 'https://dominio.com', 'koollective' ) 
-		],
-    /*'mapa' => [
-      'titulo' => __( 'Mapa', 'koollective' ), 'tipo' => 'map',
-		],*/
+		]
   ];
 
 	return $fields;
