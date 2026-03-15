@@ -21,7 +21,6 @@
  * Diseño de formulario                              | RESPUESTA ALBERTO
  * Diseño grid                                       | RESPUESTA ALBERTO
  * 
- * Chequear algoritmo DNI/NIE                        | RESPUESTA CLIENTE
  * Texto email usuario (inscrito o lista de espera)  | RESPUESTA CLIENTE
  * ¿Las lista de espera cuenta como inscripción?     | RESPUESTA CLIENTE
  *
@@ -222,8 +221,8 @@ add_shortcode('kollective_inscripcion', function ($atts) {
 
       if($form['dni'] == '') {
         $errors[] = __("Debes de rellenar el campo «DNI».", 'koollective');
-      } else if (!preg_match('/^[0-9]{8}[A-Z]$/', $form['dni'])) {
-        $errors[] = __("El «DNI» no tiene el formato adecuado. Solo deben ser 8 números y una letra en mayúsculas.", 'koollective');
+      } else if (!validDniCifNie($form['dni'])) {
+        $errors[] = __("El «DNI/NIE» no tiene el formato adecuado. Recuerda que las letras deben ser en mayúsculas.", 'koollective');
       }
     
       if($form['email'] == '') {
@@ -304,8 +303,8 @@ add_shortcode('kollective_inscripcion', function ($atts) {
         <input type="text" name="apellidos" value="<?=(isset($form['apellidos']) ? $form['apellidos'] : "") ?>" placeholder="<?php _e("Introduce tus apellidos", 'koollective'); ?>" required />
       </label>
       <label>
-        <?php _e("DNI", 'koollective'); ?> *
-        <input type="text" name="dni" value="<?=(isset($form['dni']) ? $form['dni'] : "") ?>" placeholder="<?php _e("Introduce tu DNI con letra", 'koollective'); ?>" maxlength="9" required />
+        <?php _e("DNI/NIE", 'koollective'); ?> *
+        <input type="text" name="dni" value="<?=(isset($form['dni']) ? $form['dni'] : "") ?>" placeholder="<?php _e("Introduce tu DNI/NIE con letras mayúsculas", 'koollective'); ?>" maxlength="9" required />
       </label>
       <label>
         <?php _e("Email", 'koollective'); ?> *
@@ -553,4 +552,68 @@ function koollective_export_csv() {
     echo $csv;
     wp_die();
   }
+}
+
+
+/**
+ * Validar DNI (NIF), CIF, NIE
+ *
+ * @param string $dni Número de identificación
+ *
+ * @return bool Si es válido (true) o no (false)
+ */
+function validDniCifNie($dni) {
+    $dni = strtoupper($dni); // Convertir a mayúsculas
+    $letras = 'TRWAGMYFPDXBNJZSQVHLCKE';
+
+    // Validar formato general
+    if (!preg_match('/^[A-Z0-9]{9}$/', $dni)) {
+        return false;
+    }
+
+    // Validar NIF estándar (8 números + 1 letra)
+    if (preg_match('/^[0-9]{8}[A-Z]$/', $dni)) {
+        $numero = substr($dni, 0, 8);
+        $letra = substr($dni, -1);
+        return $letra === $letras[$numero % 23];
+    }
+
+    // Validar NIE (X, Y, Z seguido de 7 números y una letra)
+    if (preg_match('/^[XYZ][0-9]{7}[A-Z]$/', $dni)) {
+        $numero = str_replace(['X', 'Y', 'Z'], ['0', '1', '2'], substr($dni, 0, 1)) . substr($dni, 1, 7);
+        $letra = substr($dni, -1);
+        return $letra === $letras[$numero % 23];
+    }
+
+    // Validar CIF (letra + 7 números + letra/número)
+    /*if (preg_match('/^[ABCDEFGHJNPQRSUVW][0-9]{7}[A-Z0-9]$/', $dni)) {
+        $sumaPar = 0;
+        $sumaImpar = 0;
+
+        for ($i = 1; $i <= 6; $i += 2) {
+            $sumaPar += (int) $dni[$i];
+        }
+
+        for ($i = 0; $i <= 6; $i += 2) {
+            $doble = (int) $dni[$i] * 2;
+            $sumaImpar += $doble > 9 ? $doble - 9 : $doble;
+        }
+
+        $sumaTotal = $sumaPar + $sumaImpar;
+        $control = (10 - ($sumaTotal % 10)) % 10;
+
+        $controlEsperado = $dni[8];
+        if (ctype_alpha($controlEsperado)) {
+            return $controlEsperado === chr(64 + $control); // Letra como control
+        } else {
+            return $controlEsperado == $control; // Número como control
+        }
+    }*/
+
+    // Validar NIE especial (T seguido de 8 caracteres)
+    if (preg_match('/^T[0-9]{8}$/', $dni)) {
+        return true; // Se acepta directamente
+    }
+
+    return false; // No cumple ningún formato válido
 }
