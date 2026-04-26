@@ -41,8 +41,6 @@ include_once(dirname(__FILE__)."/admin.php");
 
 add_shortcode('kollective_jornadas', function ($atts) {
   ob_start(); ?>
-  <div class="gridjornadas">
-    <h1><?php _e("Jornadas", 'koollective'); ?></h1>
     <?php $args = [
         'post_type' => 'jornada',
         'posts_per_page' => -1,
@@ -62,21 +60,30 @@ add_shortcode('kollective_jornadas', function ($atts) {
         ]
       ];
       $my_query = new WP_Query( $args ); ?>
-    <p><?php printf(__("%d jornadas", 'koollective'), $my_query->found_posts); ?></p>
-    <div>
+
+        <section>
+          <span id="BILBAO" class="py-4 ancla_fixed"></span>
+          <div class="row sectionverde">
+            <div class="col-9">
+              <h2>PRÓXIMOS EVENTOS BILBAO</h2>
+            </div>
+            <div class="col-3">
+              <p class="m-0 "><a href="" class="d-flex justify-content-end"><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/
+ico_anterior.png" alt=""
+                    aria-hidden="true"><span> Ver eventos<br>anteriores</span> </a></p>
+            </div>
+          </div>
+
+
       <?php if ( $my_query->have_posts() ) { ?>
+      <ul class="container experiencias">
+            <span id="INAGURACION-BILBAO" class="ancla_fixed"></span>
+
         <?php while ( $my_query->have_posts() ) { $my_query->the_post(); $post_id = get_the_id(); 
             $local = get_post(get_post_meta($post_id, "_jornada_local", true)); ?>
-            <div style="--bgimage: url(<?php echo wp_get_attachment_image_url(get_post_thumbnail_id($post_id), 'medium'); ?>);">
-                <div>
-                  <h2><?php the_title(); ?></h2>
-                  <?php the_content(); ?>
-                  <p><?php echo get_post_meta($post_id, "_jornada_fechainicio", true); ?></p>
-                  <p><?php echo get_post_meta($post_id, "_jornada_fechafin", true); ?></p>
-                  <p><a href='<?php echo get_post_meta($local->ID, "_local_linkgooglemap", true); ?>' target="_blank"><?php echo $local->post_title; ?></a></p>
-                  <p><?php echo get_post_meta($local->ID, "_local_direccion", true); ?></p>
-                </div>
-                <div><?php
+
+              
+                <?php
                   $args = [
                     'post_type' => 'actividad',
                     'posts_per_page' => -1,
@@ -97,93 +104,53 @@ add_shortcode('kollective_jornadas', function ($atts) {
 
                   $actividades = get_posts($args);
                   if(count($actividades) > 0) { ?>
-                  <h3><?php _e("Actividades", 'koollective'); ?></h3>
+
+                  <?php /*<h3><?php _e("Actividades", 'koollective'); ?></h3> */ ?>
                   <?php foreach($actividades as $actividad) { ?>
-                    <div style="--bgimage: url(<?php echo wp_get_attachment_image_url(get_post_thumbnail_id($actividad->ID), 'medium'); ?>);">
-                      <h4><?php echo $actividad->post_title; ?></h4>
-                      <p><?php $fecha = get_post_meta($actividad->ID, "_actividad_fechahora", true); echo str_replace("T", " - ", $fecha); ?></p>
-                      <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
-                      <?php if(strtotime("now") < strtotime($fecha)) { ?>
-                        <a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>"><?php _e("Inscribirse", 'koollective'); ?></a>
-                      <?php } ?>
-                    </div>
-                <?php } } ?></div>
-            </div>
+
+                    <li class="row  py-3 ">
+                      <div class="col-12  col-md-2  d-flex align-items-center flex-column justify-content-center pt-5 pt-md-0">
+                        <span class="text-size50">27</span> <span class="text-size20 d-block mt-3">FEBR</span>
+                        <p class="mt-5 white text-center"><?php the_title(); ?></p>
+                        <?php /* <?php the_content(); ?> 
+                        <p><?php echo get_post_meta($post_id, "_jornada_fechainicio", true); ?></p>
+                        <p><?php echo get_post_meta($post_id, "_jornada_fechafin", true); ?></p> */ ?>
+                        
+                      </div>
+                      <div class="col-12 col-md-7">
+                        <h3 class="fonttitulo"><?php echo $actividad->post_title; ?></h3>
+                        <ul class="fechahora mb-4">
+                          <li><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/hora.svg" class="white" alt=""><?php $fecha = get_post_meta($actividad->ID, "_actividad_fechahora", true); echo str_replace("T", " - ", $fecha); ?></li>
+                          <li><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/localition.svg" alt="" class="white"><a href='<?php echo get_post_meta($local->ID, "_local_linkgooglemap", true); ?>' target="_blank"><?php echo $local->post_title; ?></a></li>
+                        </ul>
+                        <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
+
+                      </div>
+                      <div class="col-12 col-md-3  d-flex  align-items-center  justify-content-center">
+                        <?php if(strtotime("now") < strtotime($fecha)) { ?>
+                        <p><a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>" class="btn btn_secondary mt-4 mt-md-0" target="_blank"><?php _e("INFORMACIÓN Y RESERVA", 'koollective'); ?></a></p>
+                        <?php } ?>
+                      </div>
+                    </li>
+
+                <?php } } ?>
         <?php } ?>
+        </ul>
       <?php } ?>
-    </div>
-  </div>
-  <style>
-    .gridjornadas {
-      width: 100%;
-    }
+</section> 
 
-    .gridjornadas > div {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .gridjornadas > div > div {
-      background-color: #cecece;
-      padding: 20px 20px 20px 200px;
-      position: relative;
-      width: 100%;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
-
-    .gridjornadas > div > div:after {
-      content: "";
-      position: absolute;
-      width: 180px;
-      height: 100%;
-      top: 0px;
-      left: 0px;
-      background: white var(--bgimage) center center no-repeat;
-      background-size: cover;
-    }
-
-    .gridjornadas > div > div > div {
-      display: flex;
-      gap: 10px;
-      width: 50%;
-    }
-
-    .gridjornadas > div > div > div:nth-of-type(1) {
-      flex-wrap: wrap;
-    }
-
-    .gridjornadas > div > div > div:nth-of-type(2) {
-      flex-wrap: wrap;
-    }
-
-    .gridjornadas > div > div > div:nth-of-type(2) > h3 {
-      width: 100%;
-      border-bottom: 1px solid black;
-    }
-
-    .gridjornadas > div > div > div:nth-of-type(2) > div {
-      background-color: white;
-      padding: 200px 10px 10px 10px;
-      position: relative;
-      width: calc(50% - 25px);
-    }
-
-    .gridjornadas > div > div > div:nth-of-type(2) > div:after {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 190px;
-      top: 0px;
-      left: 0px;
-      background: white var(--bgimage) center center no-repeat;
-      background-size: cover;
-    }
-  </style>
   <?php return ob_get_clean(); // fin del nivel actual de buffer
 });
+
+
+
+
+
+
+
+
+
+
 
 add_shortcode('kollective_inscripcion', function ($atts) {
   ob_start(); 
