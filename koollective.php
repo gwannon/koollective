@@ -110,7 +110,8 @@ ico_anterior.png" alt=""
 
                     <li class="row  py-3 ">
                       <div class="col-12  col-md-2  d-flex align-items-center flex-column justify-content-center pt-5 pt-md-0">
-                        <span class="text-size50">27</span> <span class="text-size20 d-block mt-3">FEBR</span>
+                        <?php $fecha = get_post_meta($actividad->ID, "_actividad_fechahora", true); ?>
+                        <span class="text-size50"><?php echo date("d", strtotime($fecha)); ?></span> <span class="text-size20 d-block mt-3"><?php _e(date("F", strtotime($fecha))); ?></span>
                         <p class="mt-5 white text-center"><?php the_title(); ?></p>
                         <?php /* <?php the_content(); ?> 
                         <p><?php echo get_post_meta($post_id, "_jornada_fechainicio", true); ?></p>
@@ -120,7 +121,7 @@ ico_anterior.png" alt=""
                       <div class="col-12 col-md-7">
                         <h3 class="fonttitulo"><?php echo $actividad->post_title; ?></h3>
                         <ul class="fechahora mb-4">
-                          <li><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/hora.svg" class="white" alt=""><?php $fecha = get_post_meta($actividad->ID, "_actividad_fechahora", true); echo str_replace("T", " - ", $fecha); ?></li>
+                          <li><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/hora.svg" class="white" alt=""><?php echo date("H:i", strtotime($fecha)); ?></li>
                           <li><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/localition.svg" alt="" class="white"><a href='<?php echo get_post_meta($local->ID, "_local_linkgooglemap", true); ?>' target="_blank"><?php echo $local->post_title; ?></a></li>
                         </ul>
                         <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>

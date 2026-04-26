@@ -115,3 +115,13 @@ function koollective_save_custom_fields( $post_id ) { //Save changes
     else if (!isset($_POST[$label]) && $datos['tipo'] == 'multiple') delete_post_meta( $post_id, $label);
 	}
 }
+
+// Libs ----------------------------------------
+function sort_terms_hierarchically($terms) {
+	usort($terms, "cmp");
+	return $terms;
+}
+
+function cmp($a, $b) {
+	return strcmp($a->parent, $b->parent);
+}
