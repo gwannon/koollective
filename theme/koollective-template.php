@@ -22,7 +22,6 @@ Template Name: Koollective
     integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+"
     crossorigin="anonymous"></script>
   <!--<link rel="stylesheet" href="style.css">-->
-  <link rel="stylesheet" href="kollecitve.css">
   <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet" />
   <link href="images/favicon.png" rel="icon" />
   <script>
@@ -95,8 +94,14 @@ Template Name: Koollective
       <div class="container_form mx-auto  w-100">
         <header id="header" class="menu"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/logo-kollective.png" alt="kollective" class="w-100">
           <ul class="nav nav-list affix" id="navbar-example">
-            <li class="nav-item"><a class="nav-link" href="#BILBAO">EVENTOS BILBAO</a> </li>
-            <li class="nav-item"><a class="nav-link" href="#DONOSTI">EVENTOS DONOSTI</a> </li>
+            <?php $args = [
+              'hide_empty' => 1,
+            ];
+            $ciudades = get_terms('ciudad', $args ); 
+            
+            foreach($ciudades as $ciudad) { if($ciudad->parent != 0) { ?>
+              <li class="nav-item"><a class="nav-link" href="#<?php echo $ciudad->slug; ?>">EVENTOS <?php echo strtoupper($ciudad->name); ?></a> </li>
+            <?php } } ?>
             <li class="nav-item"><a class="nav-link" href="#MOVIMIENTO">MOVIMIENTO KOOLECTIVE</a> </li>
             <li class="nav-item"><a class="nav-link" href="#CONTACTO">CONTACTO</a> </li>
           </ul>
@@ -111,7 +116,7 @@ Template Name: Koollective
                     pionero que transforma la forma en que entendemos y practicamos el consumo
                     de moda. Una iniciativa que impulsa una cultura más creativa, sostenible,
                     inclusiva y participativa.</p>
-                  <p><a href="#BILBAO" class="btn btn_primary">DESCUBRE TODOS LOS EVENTOS</a></p>
+                  <!-- <p><a href="#listado" class="btn btn_primary">DESCUBRE TODOS LOS EVENTOS</a></p> -->
                 </div>
               </div>
             </div>
@@ -119,45 +124,12 @@ Template Name: Koollective
         </section>
 
       <!-- ---------------------------------------------- -->
-
-
-
-
-
-
-
-
-
-
-<?php if (have_posts()) :
-   while (have_posts()) :
-      the_post();
-      the_content();
-   endwhile;
-endif; ?>
-
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
+        <?php if (have_posts()) :
+          while (have_posts()) :
+              the_post();
+              the_content();
+          endwhile;
+        endif; ?>
       <!-- ---------------------------------------------- -->
 
         <section> <span id="MOVIMIENTO" class=" ancla_fixed"></span>
@@ -246,7 +218,6 @@ logo-.kooepera.png" alt="koopera" class="mb-3" />
         <button id="btnSubir">↑ <span class="sr-only">Subir</span></button>
         <script>
           const btnSubir = document.getElementById('btnSubir');
-
           window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
               btnSubir.style.display = 'block';
@@ -254,7 +225,6 @@ logo-.kooepera.png" alt="koopera" class="mb-3" />
               btnSubir.style.display = 'none';
             }
           });
-
           btnSubir.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           });
@@ -273,7 +243,6 @@ logo-.kooepera.png" alt="koopera" class="mb-3" />
       });
 
     }).call(this);
-
   </script>
   <style>
     <?php include(__DIR__."/koollective-nuevo/style.php"); ?>

@@ -25,7 +25,7 @@ function koollective_jornada_create_post_type() {
     'show_ui'       => true,
 		'menu_position' => 200,
 		'query_var' 	=> true,
-		'supports'      => array( 'title', 'editor', 'thumbnail', /*'excerpt',*/ 'revisions' /*, 'page-attributes'*/ ),
+		'supports'      => array( 'title', /*'editor', 'thumbnail','excerpt', 'revisions', 'page-attributes'*/ ),
 		//'rewrite'	    => array( 'slug' => 'jornadas', 'with_front' => false),
 		'rewrite'	    => false,
     'query_var'	    => true,
@@ -93,7 +93,7 @@ function koollective_jornada_set_custom_edit_columns($columns) {
   $columns['fechafin'] = __( 'Fecha de fin', 'koollective');
 	$columns['local'] = __( 'Local', 'koollective');
 	$columns['actividades'] = __( 'Actividades', 'koollective');
-  $columns['imagen'] = __( 'Imagen', 'koollective');
+  //$columns['imagen'] = __( 'Imagen', 'koollective');
   unset($columns['date']);
   return $columns;
 }
@@ -133,9 +133,9 @@ function koollective_jornada_custom_column( $column ) {
     echo get_post_meta($post->ID, "_jornada_fechainicio", true);
   } else if ($column == 'fechafin') {
     echo get_post_meta($post->ID, "_jornada_fechafin", true);
-  } else if ($column == 'imagen') {
+  } /*else if ($column == 'imagen') {
 		if(has_post_thumbnail($post->ID)) echo "<img src='".get_the_post_thumbnail_url($post->ID, 'thumbnail')."' alt='' style='width: 150px; height: 150px;' />";
-  }
+  }*/
 }
 
 if ( is_admin() && 'edit.php' == $pagenow && isset($_GET['post_type']) && 'jornada' == $_GET['post_type'] ) {

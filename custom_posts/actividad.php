@@ -25,7 +25,7 @@ function koollective_actividad_create_post_type() {
     'show_ui'       => true,
 		'menu_position' => 100,
 		'query_var' 	=> true,
-		'supports'      => array( 'title', /*'excerpt',*/ 'editor', 'thumbnail', 'revisions' /*, 'page-attributes'*/ ),
+		'supports'      => array( 'title', /*'excerpt',*/ 'editor', 'thumbnail'/*, 'revisions', 'page-attributes'*/ ),
 		//'rewrite'	    => array( 'slug' => 'actividades', 'with_front' => false),
     'rewrite'	    => false,
 		'query_var'	    => true,
@@ -116,7 +116,7 @@ function koollective_actividad_custom_column( $column ) {
     echo "/".get_post_meta($post->ID, "_actividad_maxinscripciones", true);
   } else if ($column == 'imagen') {
 		if(has_post_thumbnail($post->ID)) echo "<img src='".get_the_post_thumbnail_url($post->ID, 'thumbnail')."' alt='' style='width: 150px; height: 150px;' />";
-  }
+  } 
 }
 
 if ( is_admin() && 'edit.php' == $pagenow && isset($_GET['post_type']) && 'actividad' == $_GET['post_type'] ) {

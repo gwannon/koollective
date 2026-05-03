@@ -25,7 +25,7 @@ function koollective_local_create_post_type() {
 		'show_ui'       => true,
 		'menu_position' => 300,
 		'query_var' 	=> true,
-		'supports'      => array( 'title', /*'editor',*/ 'thumbnail' /*, 'page-attributes'*/ ),
+		'supports'      => array( 'title', /*'editor', 'thumbnail', 'page-attributes'*/ ),
 		'rewrite'	    => false,
 		'query_var'	    => true,
 		'has_archive' 	=> false,
@@ -66,7 +66,7 @@ function koollective_get_local_custom_fields() {
 // ------------------------------------------------
 function koollective_local_set_custom_edit_columns($columns) {
 	$columns['ciudad'] = __( 'Ciudad', 'koollective');
- 	$columns['imagen'] = __( 'Imagen', 'koollective');
+ 	//$columns['imagen'] = __( 'Imagen', 'koollective');
   unset($columns['date']);
   return $columns;
 }
@@ -83,9 +83,9 @@ function koollective_local_custom_column( $column ) {
       }
       if(count($string) > 0) echo implode (", ", $string);
     }
-  } else if ($column == 'imagen') {
+  } /*else if ($column == 'imagen') {
 		if(has_post_thumbnail($post->ID)) echo "<img src='".get_the_post_thumbnail_url($post->ID, 'thumbnail')."' alt='' style='width: 150px; height: 150px;' />";
-  }
+  } */  
 }
 
 function koollective_local_post_by_ciudad_taxonomy() {
