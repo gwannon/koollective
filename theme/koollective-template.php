@@ -21,7 +21,7 @@ Template Name: Koollective
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
     integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+"
     crossorigin="anonymous"></script>
-  <!--<link rel="stylesheet" href="style.css">-->
+  <meta name="robots" content="nofollow,noindex">
   <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet" />
   <link href="images/favicon.png" rel="icon" />
   <script>
@@ -140,15 +140,9 @@ Template Name: Koollective
 decofoto.png" alt="koollective" /></div>
                 <div id="mainCarousel" class="carousel slide carousel-fade" data-ride="carousel">
                   <div class="carousel-inner">
-                    <div class="carousel-item active"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/
-/Property-1-Variant2.jpg" class="d-block w-100"
-                        alt="..."> </div>
-                    <div class="carousel-item"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/
-Property-1-Variant3.jpg" class="d-block w-100"
-                        alt="..."> </div>
-                    <div class="carousel-item"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/
-Property-1-Variant4.jpg" class="d-block w-100"
-                        alt="..."> </div>
+                    <div class="carousel-item active"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/Property-1-Variant2.jpg" class="d-block w-100" alt="..."> </div>
+                    <div class="carousel-item"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/Property-1-Variant3.jpg" class="d-block w-100" alt="..."> </div>
+                    <div class="carousel-item"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/Property-1-Variant4.jpg" class="d-block w-100" alt="..."> </div>
                   </div>
                 </div>
                 <script>
