@@ -130,7 +130,7 @@ add_shortcode('kollective_jornadas', function ($atts) {
                     </div>
                     <div class="col-12 col-md-3  d-flex  align-items-center  justify-content-center">
                       <?php if(strtotime("now") < strtotime($fecha)) { ?>
-                      <p><a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>" class="btn btn_secondary mt-4 mt-md-0" target="_blank"><?php _e("INFORMACIÓN Y RESERVA", 'koollective'); ?></a></p>
+                      <p><a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>" class="btn btn_secondary mt-4 mt-md-0"><?php _e("INFORMACIÓN Y RESERVA", 'koollective'); ?></a></p>
                       <?php } ?>
                     </div>
                   </li>
@@ -210,7 +210,10 @@ add_shortcode('kollective_inscripcion', function ($atts) {
                 </ul>
                 <?php echo apply_filters("the_content", $actividad->post_content); ?>
             </div>
-            <div class="col-12  col-md-4"> <img src="<?php echo get_the_post_thumbnail_url($actividad->ID, 'large'); ?>" class="rounded d-block w-100 " alt="<?php echo $actividad->post_title; ?>">
+            <div class="col-12  col-md-4">
+              <?php if(has_post_thumbnail($actividad->ID)) { ?>
+                <img src="<?php echo get_the_post_thumbnail_url($actividad->ID, 'large'); ?>" class="rounded d-block w-100 " alt="<?php echo $actividad->post_title; ?>">
+              <?php } ?>
             </div>
           </div>
         </div>

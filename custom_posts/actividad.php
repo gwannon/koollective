@@ -62,7 +62,12 @@ function koollective_get_actividad_jornadas() {
   ]; 
   $posts = get_posts($args);
   foreach($posts as $post) {
-    $locales[$post->ID] =  $post->post_title ." (".get_post_meta($post->ID, "_jornada_fechainicio", true).")";
+
+    
+    $local_id = get_post_meta($post->ID, "_jornada_local", true); 
+    $local = get_post($local_id);
+
+    $locales[$post->ID] =  $post->post_title ." (".get_post_meta($post->ID, "_jornada_fechainicio", true)." - ".$local->post_title.")";
   }
   return $locales;
 }
