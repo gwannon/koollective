@@ -129,7 +129,7 @@ add_shortcode('kollective_jornadas', function ($atts) {
                       <?php echo apply_filters("the_content", get_post_meta($actividad->ID, "_actividad_resumen", true)); ?>
                     </div>
                     <div class="col-12 col-md-3  d-flex  align-items-center  justify-content-center">
-                      <?php if(strtotime("now") < strtotime($fecha)) { ?>
+                      <?php if(strtotime("now") < strtotime($fecha) && get_post_meta($actividad->ID, "_actividad_estado_inscripcion", true) != "cerrada") { ?>
                       <p><a href="<?php echo get_the_permalink(INSCRIPTION_PAGE_ID); ?>?actividad=<?php echo $actividad->ID; ?>" class="btn btn_secondary mt-4 mt-md-0"><?php _e("INFORMACIÓN Y RESERVA", 'koollective'); ?></a></p>
                       <?php } ?>
                     </div>
@@ -219,7 +219,7 @@ add_shortcode('kollective_inscripcion', function ($atts) {
         </div>
       </section>
       <div id="viewform" style="min-height: 100px;"> </div>
-    <?php if(strtotime("now") >= strtotime($fecha)) { return ob_get_clean(); } // inscripción cerrada ?>
+    <?php if(strtotime("now") >= strtotime($fecha) || get_post_meta($actividad->ID, "_actividad_estado_inscripcion", true) == "cerrada") { return ob_get_clean(); } // inscripción cerrada ?>
     <div class="container mt-5">
       <div class="row">
         <div class="col-12  col-md-2  "></div>

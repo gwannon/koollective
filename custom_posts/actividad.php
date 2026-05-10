@@ -84,6 +84,12 @@ function koollective_get_actividad_custom_fields() {
     'jornada' => [
       'titulo' => __( 'Jornada', 'koollective' ), 'tipo' => 'select', 'valores' =>  koollective_get_actividad_jornadas()
 		],
+    'estado_inscripcion' => [
+      'titulo' => __( 'Estado inscripción', 'koollective' ), 'tipo' => 'select', 'valores' =>  [
+        'abierta' => __('Abierta', 'koollective'),
+        'cerrada' => __('Cerrada', 'koollective')
+      ]
+] ,
     'maxinscripciones' => [
       'titulo' => __( 'Número de asistentes máximo', 'koollective' ), 'tipo' => 'number'
 		],
