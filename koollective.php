@@ -74,28 +74,28 @@ add_shortcode('kollective_jornadas', function ($atts) {
           foreach($locales as $local) {
             //Sacamos las actividades de cada ciudad
             $args = [
-              'post_type' => 'jornada',
+              'post_type' => 'actividad',
               'posts_per_page' => -1,
               'post_status' => 'publish',
-              'suppress_filters' => false,
-              'meta_key' => '_jornada_fechainicio',
+              /*'suppress_filters' => false,*/
+              'meta_key' => '_actividad_fechahora',
               'orderby' => 'meta_value',
               'meta_type' => 'DATE',
               'order' => 'ASC',
               'meta_query' => [
                 [
-                  'key' => '_jornada_local',
+                  'key' => '_actividad_local',
                   'value' => $local->ID,
                   'compare' => '='
                 ]
               ]
             ];
-            $jornadas = get_posts($args);
-            foreach($jornadas as $jornada){ ?>
+            $actividades = get_posts($args);
+            foreach($actividades as $actividad){ $jornada = get_post(get_post_meta($actividad->ID, "_actividad_jornada", true)); ?>
               <ul class="container experiencias <?php echo $ciudad->slug; ?>">
                 <span id="<?php echo $jornada->post_name; ?>" class="ancla_fixed"></span>
                 <?php //Sacamos las actividades de cada ciudad
-                $args = [
+                /*$args = [
                   'post_type' => 'actividad',
                   'posts_per_page' => -1,
                   'post_status' => 'publish',
@@ -113,7 +113,7 @@ add_shortcode('kollective_jornadas', function ($atts) {
                   ]
                 ];
                 $actividades = get_posts($args);
-                foreach($actividades as $actividad) { $fecha = get_post_meta($actividad->ID, "_actividad_fechahora", true); 
+                foreach($actividades as $actividad) {*/ $fecha = get_post_meta($actividad->ID, "_actividad_fechahora", true); 
                   if(strtotime("now") <= strtotime($fecha)) $counter_actividades++;?>
                   <li class="row <?php echo $ciudad->slug; ?> py-3<?php echo (strtotime("now") >= strtotime($fecha) ? " pastevent d-none" : "" ); ?>">
                     <div class="col-12  col-md-2  d-flex align-items-center flex-column justify-content-center pt-5 pt-md-0">
@@ -134,7 +134,7 @@ add_shortcode('kollective_jornadas', function ($atts) {
                       <?php } ?>
                     </div>
                   </li>
-                <?php } ?>  
+                <?php /* } */ ?>  
               </ul>         
             <?php }
           } 
@@ -192,7 +192,7 @@ add_shortcode('kollective_inscripcion', function ($atts) {
     $actividad = get_post($_REQUEST['actividad']); 
     $fecha = get_post_meta($actividad->ID, "_actividad_fechahora", true);
     $jornada = get_post(get_post_meta($actividad->ID, "_actividad_jornada", true));
-    $local = get_post(get_post_meta($jornada->ID, "_jornada_local", true)); ?>
+    $local = get_post(get_post_meta($actividad->ID, "_actividad_local", true)); ?>
       <section>
         <div class="container mt-5"></div>
         <div class="container experiencias">

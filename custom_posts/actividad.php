@@ -62,12 +62,25 @@ function koollective_get_actividad_jornadas() {
   ]; 
   $posts = get_posts($args);
   foreach($posts as $post) {
+    $locales[$post->ID] =  $post->post_title ." (".get_post_meta($post->ID, "_jornada_fechainicio", true).")";
+  }
+  return $locales;
+}
 
-    
-    $local_id = get_post_meta($post->ID, "_jornada_local", true); 
-    $local = get_post($local_id);
 
-    $locales[$post->ID] =  $post->post_title ." (".get_post_meta($post->ID, "_jornada_fechainicio", true)." - ".$local->post_title.")";
+function koollective_get_actividad_locales() {
+  $locales = [];
+  $args = [
+    'post_type' => 'local',
+    'posts_per_page' => -1,
+    'post_status' => 'publish',
+    'order' => 'ASC',
+    'orderby' => 'title',
+    //'suppress_filters' => false,
+  ]; 
+  $posts = get_posts($args);
+  foreach($posts as $post) {
+    $locales[$post->ID] =  $post->post_title;
   }
   return $locales;
 }
@@ -83,6 +96,9 @@ function koollective_get_actividad_custom_fields() {
 		],
     'jornada' => [
       'titulo' => __( 'Jornada', 'koollective' ), 'tipo' => 'select', 'valores' =>  koollective_get_actividad_jornadas()
+		],
+    'local' => [
+      'titulo' => __( 'Local', 'koollective' ), 'tipo' => 'select', 'valores' =>  koollective_get_actividad_locales()
 		],
     'estado_inscripcion' => [
       'titulo' => __( 'Estado inscripción', 'koollective' ), 'tipo' => 'select', 'valores' =>  [
@@ -105,6 +121,7 @@ function koollective_get_actividad_custom_fields() {
 function koollective_actividad_set_custom_edit_columns($columns) {
   $columns['fechahora'] = __( 'Fecha y hora', 'koollective');
 	$columns['jornada'] = __( 'Jornada', 'koollective');
+  $columns['local'] = __( 'Local', 'koollective');
 	$columns['inscripciones'] = __( 'Inscripciones', 'koollective');
   $columns['imagen'] = __( 'Imagen', 'koollective');
   unset($columns['date']);
@@ -113,7 +130,13 @@ function koollective_actividad_set_custom_edit_columns($columns) {
 
 function koollective_actividad_custom_column( $column ) {
   global $post;
-  if ($column == 'fechahora') {
+  if ($column == 'local') {
+    $local_id = get_post_meta($post->ID, "_actividad_local", true);
+    if($local_id > 0){
+      $local = get_post($local_id);
+      echo "<a href='".get_edit_post_link($local->ID)."'>".$local->post_title."</a>";
+    }
+  } else if ($column == 'fechahora') {
      echo get_post_meta($post->ID, "_actividad_fechahora", true);
   } else if ($column == 'jornada') {
     $jornada = get_post(get_post_meta($post->ID, "_actividad_jornada", true));

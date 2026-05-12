@@ -50,34 +50,10 @@ add_action('save_post', 'koollective_save_custom_fields' );
 //CAMPOS personalizados ---------------------------
 // ------------------------------------------------
 
-function koollective_get_jornada_locales() {
-  $locales = [];
-  $args = [
-    'post_type' => 'local',
-    'posts_per_page' => -1,
-    'post_status' => 'publish',
-    'order' => 'ASC',
-    'orderby' => 'title',
-    //'suppress_filters' => false,
-  ]; 
-  $posts = get_posts($args);
-  foreach($posts as $post) {
-    $locales[$post->ID] =  $post->post_title;
-  }
-  return $locales;
-}
-
-
 function koollective_get_jornada_custom_fields() {
 	$fields = [
     'fechainicio' => [
       'titulo' => __( 'Fecha de inicio', 'koollective' ), 'tipo' => 'date'
-		],
-    'fechafin' => [
-      'titulo' => __( 'Fecha de fin', 'koollective' ), 'tipo' => 'date'
-		],
-    'local' => [
-      'titulo' => __( 'Local', 'koollective' ), 'tipo' => 'select', 'valores' =>  koollective_get_jornada_locales()
 		],
     'maxinscripciones' => [
       'titulo' => __( 'Máximas inscripciones permitidas', 'koollective' ), 'tipo' => 'number', 
@@ -90,8 +66,7 @@ function koollective_get_jornada_custom_fields() {
 // ------------------------------------------------
 function koollective_jornada_set_custom_edit_columns($columns) {
   $columns['fechainicio'] = __( 'Fecha de inicio', 'koollective');
-  $columns['fechafin'] = __( 'Fecha de fin', 'koollective');
-	$columns['local'] = __( 'Local', 'koollective');
+  $columns['maxinscripciones'] = __( 'Máximas inscripciones permitidas', 'koollective');
 	$columns['actividades'] = __( 'Actividades', 'koollective');
   //$columns['imagen'] = __( 'Imagen', 'koollective');
   unset($columns['date']);
@@ -100,10 +75,7 @@ function koollective_jornada_set_custom_edit_columns($columns) {
 
 function koollective_jornada_custom_column( $column ) {
   global $post;
-  if ($column == 'local') {
-    $local = get_post(get_post_meta($post->ID, "_jornada_local", true));
-    echo "<a href='".get_edit_post_link($local->ID)."'>".$local->post_title."</a>";
-  } else if ($column == 'actividades') {
+  if ($column == 'actividades') {
     $args = [
       'post_type' => 'actividad',
       'posts_per_page' => -1,
@@ -131,8 +103,8 @@ function koollective_jornada_custom_column( $column ) {
     $actividades = get_posts($args);
   } else if ($column == 'fechainicio') {
     echo get_post_meta($post->ID, "_jornada_fechainicio", true);
-  } else if ($column == 'fechafin') {
-    echo get_post_meta($post->ID, "_jornada_fechafin", true);
+  } else if ($column == 'maxinscripciones') {
+    echo get_post_meta($post->ID, "_jornada_maxinscripciones", true);
   } /*else if ($column == 'imagen') {
 		if(has_post_thumbnail($post->ID)) echo "<img src='".get_the_post_thumbnail_url($post->ID, 'thumbnail')."' alt='' style='width: 150px; height: 150px;' />";
   }*/
