@@ -1,7 +1,16 @@
  html {
    scroll-behavior: smooth;
  }
-
+a {
+    background-color: transparent;
+    color: #3eb397;
+    text-decoration: none;
+}
+a:hover {
+    background-color: transparent;
+    color: #c36;
+    text-decoration: none;
+}
  body,
  html {
    height: 100%;
@@ -60,7 +69,19 @@
      padding-right: 5px !important;
    }
  }
+ 
 
+.object-fit-cover {
+    width: 100%;
+    height: auto;
+}
+@supports (object-fit: cover) {
+    .object-fit-cover {
+        height: 100%;
+        -o-object-fit: cover !important;
+        object-fit: cover !important;
+    }
+}
  .landing {
    font-family: Montserrat;
    font-family: 15px;
@@ -78,15 +99,20 @@
    display: flex;
    flex-direction: column;
    align-items: center;
+   left: 50%;
+   transform: translate(-50%, 0%);
+   position: relative;
  }
 
  @media (min-width: 992px) {
    .landing .sticky {
-     position: fixed;
+     position: fixed!important;
      top: 0;
      max-width: 1600px;
      transition: all 1s ease;
      width: 100%;
+     left: 50%;
+     transform: translate(-50%, 0%);
    }
 
    /* 
@@ -140,13 +166,13 @@
  .landing .nav-list {
    justify-content: center;
    gap: 16px;
-   padding: 18px 5px 20px;
+   padding: 18px 0px 20px;
  }
 
  .landing .nav-list li a {
    font-size: 18px;
    color: #fff;
-   padding: 3px 20px;
+   padding: 3px 13px;
    border: 2px solid #fff;
    text-decoration: none;
    border-radius: 33px;
@@ -223,8 +249,8 @@
 
  .landing .btn_secondary:focus {
    border: 1px solid #fff;
-   color: #fff;
-   background-color: transparent;
+   color: #000;
+      background-color: #fff;
  }
 
  .landing .btn_terciary {
@@ -634,24 +660,25 @@
 
 
  #forminscripcion label {
-   color: #E4B400;
+   color: #fff;
    font-weight: bold;
    font-size: 14px;
    margin-bottom: 5px;
    width: 100%;
    margin-top: 15px;
+line-height: 21px;
  }
 
  #forminscripcion input,
  #forminscripcion textarea {
    color: #fff;
    padding: 0.7em 0.5em;
-   font-size: 16px;
+   font-size: 13px;
    box-sizing: border-box;
    width: 100%;
-   background: #666;
+   background: #454141;
    border: none;
-   border-radius: 12px;
+   border-radius: 6px;
    margin-top: 6px;
  }
 
@@ -667,21 +694,21 @@
    padding: 1em;
    border-radius: 10px;
    border: none;
-   outline: none;
-   background-color: transparent;
-   color: #000;
+    background-color: transparent;
+   color: #fff;
    font-weight: bold;
-   outline: 2px solid #75F984;
+   outline: 2px solid #f40281;
    transition: all ease-in-out 0.3s;
    font-size: 18px;
-   background: #75F984;
+   background: #f40281;
+	width: 100%;
  }
 
  #forminscripcion button:hover {
    background-color: #000;
-   outline: 2px solid #75F984;
+   outline: 2px solid #f40281;
 
-   color: #75F984;
+   color: #f40281;
  }
 
  .form-card1 {
@@ -706,10 +733,15 @@
    border-radius: 20px;
  }
 
- .fechadata {
-   background: #F40081;
-   border-radius: 23px;
-
+.fechadata {
+	background: #F40081;
+    border-radius: 0;
+    position: absolute;
+    height: 50%;
+    min-height: 277px;
+    padding: 20px;
+    box-sizing: border-box;
+    max-width: 50%;
  }
 
  .avisos {
@@ -783,7 +815,7 @@
      bottom: 0;
      left: 0;
      height: 20px;
-     width: 26px;
+     width: 21px;
      transition: all 0.15s ease-out 0s;
      background: #000;
      border: none;
@@ -794,44 +826,21 @@
      position: relative;
      z-index: 1000;
      border-radius: 50%;
-     border: 2px solid #E4B400;
+     border: 2px solid #fff;
    }
 
    .option-input:hover {
-     background: #E4B400;
+     background: #f40281;
    }
 
    .option-input:checked {
-     background: #E4B400;
+     background: #f40281;
+	 border: 2px solid #f40281
    }
 
-   .option-input:checked::before {
-     width: 14px;
-     height: 14px;
-     display: flex;
-     content: '';
-     font-size: 25px;
-     font-weight: bold;
-     position: absolute;
-     align-items: center;
-     justify-content: center;
-     border-radius: 50%;
-     background-color: #000;
-     top: 4px;
-     left: 4px;
+   
 
-   }
-
-   .option-input:checked::after {
-     -webkit-animation: click-wave 0.65s;
-     -moz-animation: click-wave 0.65s;
-     animation: click-wave 0.65s;
-     background: #E4B400;
-     content: '';
-     display: block;
-     position: relative;
-     z-index: 100;
-   }
+  
 
    .option-input.radio {
      border-radius: 50%;
@@ -905,7 +914,7 @@
    }
 
    .alert-danger {
-     background-color: #f44336;
+     background-color: blue;
      color: white;
    }
 
@@ -925,3 +934,5 @@
    .alert-danger .alert-title {
      color: #fff !important;
    }
+	 
+

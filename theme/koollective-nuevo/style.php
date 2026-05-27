@@ -2,6 +2,17 @@
    scroll-behavior: smooth;
  }
 
+a {
+    background-color: transparent;
+    color: #75F984;
+    text-decoration: none;
+}
+a:hover {
+    background-color: transparent;
+    color: #c36;
+    text-decoration: none;
+}
+
  body,
  html {
    height: 100%;
@@ -78,15 +89,20 @@
    display: flex;
    flex-direction: column;
    align-items: center;
+   left: 50%;
+   transform: translate(-50%, 0%);
+   position: relative;
  }
 
  @media (min-width: 992px) {
    .landing .sticky {
-     position: fixed;
+     position: fixed!important;
      top: 0;
      max-width: 1600px;
      transition: all 1s ease;
      width: 100%;
+     left: 50%;
+     transform: translate(-50%, 0%);
    }
 
    /* 
@@ -139,14 +155,14 @@
  /*----nav---*/
  .landing .nav-list {
    justify-content: center;
-   gap: 16px;
-   padding: 18px 5px 20px;
+   gap: 12px;
+   padding: 18px 0 20px;
  }
 
  .landing .nav-list li a {
    font-size: 18px;
    color: #fff;
-   padding: 3px 20px;
+   padding: 3px 13px;
    border: 2px solid #fff;
    text-decoration: none;
    border-radius: 33px;
@@ -218,13 +234,15 @@
  .landing .btn_secondary:hover {
    border: 1px solid #000;
    color: #000;
-   background-color: transparent;
+       background-color: #fff;;
+
  }
 
  .landing .btn_secondary:focus {
    border: 1px solid #fff;
-   color: #fff;
-   background-color: transparent;
+   color: #000;
+      background-color: #fff;;
+
  }
 
  .landing .btn_terciary {
@@ -640,6 +658,7 @@
    margin-bottom: 5px;
    width: 100%;
    margin-top: 15px;
+line-height: 21px;
  }
 
  #forminscripcion input,
@@ -905,7 +924,7 @@
    }
 
    .alert-danger {
-     background-color: #f44336;
+     background-color: blue;
      color: white;
    }
 

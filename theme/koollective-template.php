@@ -94,7 +94,10 @@ Template Name: Koollective
       <div class="container_form mx-auto  w-100">
         <header id="header" class="menu"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/logo-kollective.png" alt="kollective" class="w-100">
           <ul class="nav nav-list affix" id="navbar-example">
-            <?php $args = [
+           <li class="nav-item"><a class="nav-link" href="#MOVIMIENTO">MOVIMIENTO KOOLECTIVE</a> </li>
+
+			  
+			  <?php $args = [
               'hide_empty' => 1,
             ];
             $ciudades = get_terms('ciudad', $args ); 
@@ -102,7 +105,6 @@ Template Name: Koollective
             foreach($ciudades as $ciudad) { if($ciudad->parent != 0) { ?>
               <li class="nav-item"><a class="nav-link" href="#<?php echo $ciudad->slug; ?>">EVENTOS <?php echo strtoupper($ciudad->name); ?></a> </li>
             <?php } } ?>
-            <li class="nav-item"><a class="nav-link" href="#MOVIMIENTO">MOVIMIENTO KOOLECTIVE</a> </li>
             <li class="nav-item"><a class="nav-link" href="#CONTACTO">CONTACTO</a> </li>
           </ul>
         </header>
@@ -112,27 +114,54 @@ Template Name: Koollective
               <div class="col-12">
                 <div class="cardheader text-center">
                   <h1>Innovación comercial para la transformación social </h1>
-                  <p>Koollective es la nueva marca con la que Koopera da vida a un proyecto
-                    pionero que transforma la forma en que entendemos y practicamos el consumo
-                    de moda. Una iniciativa que impulsa una cultura más creativa, sostenible,
-                    inclusiva y participativa.</p>
+                 <p>Koollective es la nueva marca con la que Koopera da vida a un proyecto
+                  pionero que transforma la forma en que entendemos y practicamos el consumo
+                  de moda. Una iniciativa que impulsa una cultura más creativa, sostenible,
+                  inclusiva y participativa.</p>
                   <!-- <p><a href="#listado" class="btn btn_primary">DESCUBRE TODOS LOS EVENTOS</a></p> -->
                 </div>
               </div>
             </div>
           </div>
         </section>
-
-      <!-- ---------------------------------------------- -->
-        <?php if (have_posts()) :
-          while (have_posts()) :
-              the_post();
-              the_content();
-          endwhile;
-        endif; ?>
-      <!-- ---------------------------------------------- -->
-
-        <section> <span id="MOVIMIENTO" class=" ancla_fixed"></span>
+	    <section id="ESPACIO">
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-6 pr-0 "> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/
+Capa_1.png" alt="koollective" class="w-100" /> </div>
+              <div class="col-12 col-md-6 pl-0 ">
+                <div class="p-5 h-100 d-flex flex-column justify-content-center">
+                <h2>KOOLLECTIVE SPACE</h2>
+                <h3 class="mb-4">Una comunidad que convierte  la moda sostenible en experiencia</h3>
+                <p>Aquí no vienes solo a vestirte. Vienes a descubrir, aprender y formar parte de una comunidad que está cambiando la forma de consumir. Talleres, eventos y encuentros con personas que cremos, transformamos e inspiramos.</p>
+                <p><a href="#bilbao" class="btn btn_primary">Descubre todos los eventos</a></p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 col-md-6 pr-0"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/
+decofoto.png" alt="koollective" class="w-100" />
+              </div>
+              <div class="col-12 col-md-6 pl-0 bg_blue">
+                <div class="p-5 h-100 d-flex flex-column justify-content-center">
+                  <h2>KOOLLECTIVE</h2>
+                <h3 class="mb-4">Conecta a quienes quieren transformar la moda:</h3>
+                <ul>
+                  <li>Empresas que buscan activar su RSC de forma tangible</li>
+                  <li>Profesionales del diseño y estudiantes con inquietud por la moda circular</li>
+                  <li>Instituciones y organizaciones que apuestan por la sostenibilidad</li>
+                </ul>
+                <p>Creamos experiencias que van más allá de la teoría: talleres en empresa, dinámicas participativas, rediseño de prendas, aprovechamiento de materiales y espacios reales de conexión entre profesionales.</p>
+                <p>Un lugar donde aprender, colaborar y generar nuevas oportunidades.</p>
+                <p>¿Tienes una idea, quieres participar o explorar colaboraciones?</p>
+                <p><a href="mailto:emarketing@koopera.org?subject=KOOLLECTIVE" class="btn btn_terciary">Contacta con Kollective</a></p>
+         
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+     	 <section> <span id="MOVIMIENTO" class=" ancla_fixed"></span>
           <div class="container">
             <div class="row">
               <div class="col-12 text-center slidecarrusel p-0">
@@ -155,60 +184,36 @@ decofoto.png" alt="koollective" /></div>
             </div>
           </div>
         </section>
-        <section id="ESPACIO">
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-6 pr-0 "> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/
-Capa_1.png" alt="koollective" class="w-100" /> </div>
-              <div class="col-12 col-md-6 pl-0 ">
-                <div class="p-5 h-100 d-flex flex-column justify-content-center">
-                  <h2>KOOLLECTIVE BILBAO</h2>
-                  <h3 class="mb-4"> Un espacio vivo y colectivo</h3>
-                  <p>KOOLLECTIVE abre su primer espacio en Bilbao, dentro de la Koopera Store de Fernández del Campo. Un
-                    lugar donde la moda circular se une a la creatividad y la acción colectiva.</p>
-                  <p>Aquí no vienes solo a vestirte. Ven y participa en talleres, charlas y encuentros con personas
-                    creadoras y comunidades que impulsan un consumo más consciente y sostenible.</p>
-                  <p><a href="#BILBAO" class="btn btn_primary">Descubre todos los eventos</a></p>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12 col-md-6 pr-0"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/
-decofoto.png" alt="koollective" class="w-100" />
-              </div>
-              <div class="col-12 col-md-6 pl-0 bg_blue">
-                <div class="p-5 h-100 d-flex flex-column justify-content-center">
-                  <h2>KOOLLECTIVE</h2>
-                  <h3 class="mb-4">Una red viva y en movimiento</h3>
-                  <p>KOOLLECTIVE crece como una comunidad creativa y transformadora que impulsa el consumo consciente en
-                    Bilbao y Donosti actualmente, y dentro de poco, en muchas más ciudades.</p>
-                  <p>Nuestra programación combina acción y sensibilización: talleres de reparación, upcycling y
-                    customización, charlas sobre sostenibilidad y moda ética, y colaboraciones artísticas que reinventan
-                    lo usado.</p>
-                  <p>Porque la moda circular también es una forma de expresión colectiva.</p>
-                  <p><a href="#BILBAO" class="btn btn_terciary">Descubre todos los eventos</a></p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section class="py-5"> <span id="CONTACTO" class="ancla_fixed"></span>
+    
+
+      <!-- ---------------------------------------------- -->
+        <?php if (have_posts()) :
+          while (have_posts()) :
+              the_post();
+              the_content();
+          endwhile;
+        endif; ?>
+      <!-- ---------------------------------------------- -->
+		  
+		          <section class="py-5"> <span id="CONTACTO" class="ancla_fixed"></span>
           <div class="container text-center">
             <div class="row mb-4">
               <div class="col-12 text-center">
                 <p class="fonttitulo">Alguna duda / sugerencia / idea</p>
                 <p class="fonttitulo mb-4">TE ESCUCHAMOS</p>
-                <p class="fonttitulo mailto"><a href="mailto:koopera@koopera.org">koopera@koopera.org</a></p>
+              <p class="fonttitulo mailto"><a href="mailto:emarketing@koopera.org?subject=KOOLLECTIVE">emarketing@koopera.org</a></p>
               </div>
             </div>
             <div class="row pt-5">
               <div class="col-12 text-center"> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/
 logo-.kooepera.png" alt="koopera" class="mb-3" />
-                <p class="mb-0">&copy; 2025 Koopera.</p>
+                <p class="mb-0">&copy; 2026 Koopera.</p>
               </div>
             </div>
           </div>
         </section>
+
+
         <button id="btnSubir">↑ <span class="sr-only">Subir</span></button>
         <script>
           const btnSubir = document.getElementById('btnSubir');

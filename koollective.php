@@ -41,7 +41,7 @@ include_once(dirname(__FILE__)."/admin.php");
 
 add_shortcode('kollective_jornadas', function ($atts) {
   ob_start(); ?>
-  <section id="listado">
+  <section id="listado" class="container">
     <?php $args = [
         'hide_empty' => 1,
       ];
@@ -49,11 +49,11 @@ add_shortcode('kollective_jornadas', function ($atts) {
       foreach($ciudades as $ciudad) { if($ciudad->parent != 0) { $counter_actividades = 0; ?>
         <span id="<?php echo $ciudad->slug; ?>" class="py-4 ancla_fixed"></span>
         <div class="row sectionverde">
-          <div class="col-9">
+          <div class="col-lg-9">
             <h2>PRÓXIMOS EVENTOS <?php echo strtoupper($ciudad->name); ?></h2>
           </div>
-          <div class="col-3">
-            <p class="m-0 "><a href="#<?php echo $ciudad->slug; ?>" class="showpastevents d-flex justify-content-end"><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/ico_anterior.png" alt="" aria-hidden="true"><span> Ver eventos<br>anteriores</span></a></p>
+          <div class="col-lg-3">
+            <p class="m-0 "><a href="#<?php echo $ciudad->slug; ?>" class="showpastevents d-flex justify-content-end"><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/ico_anterior.png" alt="" aria-hidden="true"><span> Eventos<br>anteriores</span></a></p>
           </div>
         </div>
         <?php //Sacamos los locales de cada ciudad
@@ -198,23 +198,28 @@ add_shortcode('kollective_inscripcion', function ($atts) {
         <div class="container experiencias">
           <div class="row">
             <span id="info" class="ancla_fixed" style="scroll-margin-top: 178px;"></span>
-            <div class="col-12  col-md-2  d-flex align-items-center flex-column justify-content-center pt-5 pt-md-0 fechadata mb-5">
-              <span class="text-size50"><?php echo date("d", strtotime($fecha)); ?></span> <span class="text-size20 d-block mt-3"><?php _e(date("F", strtotime($fecha))); ?></span>
-              <p class="mt-5 white text-center"><?php echo $jornada->post_title; ?></p>
+            <div class="col-12  col-md-6 ">
+                <div class="fechadata  d-flex align-items-start flex-column justify-content-between ">
+                   <div class="mt-2">
+                    <span class="text-size20 d-block ml-2"><?php _e(date("F", strtotime($fecha))); ?></span>
+                     <span class="text-size50"><?php echo date("d", strtotime($fecha)); ?></span> 
+                  </div>
+              <p class="mt-5 white text-size20"><?php echo $jornada->post_title; ?></p>
             </div>
+          
+               <?php if(has_post_thumbnail($actividad->ID)) { ?>
+                <img src="<?php echo get_the_post_thumbnail_url($actividad->ID, 'large'); ?>" class="rounded d-block  object-fit-cover mb-5 " alt="<?php echo $actividad->post_title; ?>">
+              <?php } ?>
+              </div>
             <div class="col-12 col-md-6 pl-4">
               <h1 class="fonttitulo"><?php echo $actividad->post_title; ?></h1>
                 <ul class="fechahora mb-4">
-                  <li><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/hora.svg" class="white" alt=""><?php echo date("H:i", strtotime($fecha)); ?></li>
-                  <li><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/localition.svg" alt="" class="white"><a href='<?php echo get_post_meta($local->ID, "_local_linkgooglemap", true); ?>' target="_blank"><?php echo $local->post_title; ?></a></li>
+                  <li><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/ico_time.svg" aria-hidden="true"  alt=""><?php echo date("H:i", strtotime($fecha)); ?></li>
+                  <li><img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/icon_location.svg" alt="" aria-hidden="true"><a href='<?php echo get_post_meta($local->ID, "_local_linkgooglemap", true); ?>' target="_blank"><?php echo $local->post_title; ?></a></li>
                 </ul>
                 <?php echo apply_filters("the_content", $actividad->post_content); ?>
             </div>
-            <div class="col-12  col-md-4">
-              <?php if(has_post_thumbnail($actividad->ID)) { ?>
-                <img src="<?php echo get_the_post_thumbnail_url($actividad->ID, 'large'); ?>" class="rounded d-block w-100 " alt="<?php echo $actividad->post_title; ?>">
-              <?php } ?>
-            </div>
+          
           </div>
         </div>
       </section>
@@ -222,19 +227,16 @@ add_shortcode('kollective_inscripcion', function ($atts) {
     <?php if(strtotime("now") >= strtotime($fecha) || get_post_meta($actividad->ID, "_actividad_estado_inscripcion", true) == "cerrada") { return ob_get_clean(); } // inscripción cerrada ?>
     <div class="container mt-5">
       <div class="row">
-        <div class="col-12  col-md-2  "></div>
-        <div class="col-12  col-md-10 pl-4">
+        
+        <div class="col-12  col-md-6 pl-4 ">
+             
           <form id="forminscripcion" method="post" action="#viewform">
-            <input type="hidden" name="actividad" value="47">
             <div class="row">
-              <div class="col-12">
-                <span id="formulario" class="py-2 ancla_fixed"></span>
-                <h2>Formulario de inscripción</h2>
-
-
-
-
-
+              <input type="hidden" name="actividad" value="47">
+          
+                <div class="col-12">
+                  <span id="formulario" class="py-2 ancla_fixed"></span>
+                  <h2>Formulario de inscripción</h2>
 
                 <?php $waitlist = false; if(kollective_is_waitlist($actividad)) { $waitlist = true; ?>
                   <div class="alert alert-danger">
@@ -388,37 +390,37 @@ add_shortcode('kollective_inscripcion', function ($atts) {
                 } ?>
               </div>
               <input type="hidden" name="actividad" value="<?= $form['actividad']; ?>" />
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-6">
                 <label>
                   <?php _e("Nombre", 'koollective'); ?> *
                   <input type="text" name="nombre" value="<?=(isset($form['nombre']) ? $form['nombre'] : "") ?>" placeholder="<?php _e("Introduce tu nombre", 'koollective'); ?>" required />
                 </label>
               </div>
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-6">
                 <label>
                   <?php _e("Apellidos", 'koollective'); ?> *
                   <input type="text" name="apellidos" value="<?=(isset($form['apellidos']) ? $form['apellidos'] : "") ?>" placeholder="<?php _e("Introduce tus apellidos", 'koollective'); ?>" required />
                 </label>
               </div>
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-6">
                 <label>
                   <?php _e("DNI/NIE", 'koollective'); ?> *
                   <input type="text" name="dni" value="<?=(isset($form['dni']) ? $form['dni'] : "") ?>" placeholder="<?php _e("Introduce tu DNI/NIE con letras mayúsculas", 'koollective'); ?>" maxlength="9" required />
                 </label>
               </div>
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-6">
                 <label>
                   <?php _e("Email", 'koollective'); ?> *
                   <input type="email" name="email" value="<?=(isset($form['email']) ? $form['email'] : "") ?>" placeholder="<?php _e("Introduce tu email", 'koollective'); ?>" required />
                 </label>
               </div>
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-6">
                 <label>
                   <?php _e("Teléfono", 'koollective'); ?> *
                   <input type="text" name="telefono" value="<?=(isset($form['telefono']) ? $form['telefono'] : "") ?>" placeholder="<?php _e("Introduce tu telefono", 'koollective'); ?>" maxlength="9" required />
                 </label>
               </div>
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-6">
                 <label>
                   <?php _e("Fecha de nacimiento", 'koollective'); ?>
                   <input type="date" name="fechanacimiento" value="<?=(isset($form['fechanacimiento']) ? $form['fechanacimiento'] : "") ?>" />
@@ -430,13 +432,13 @@ add_shortcode('kollective_inscripcion', function ($atts) {
                   <input type="text" name="direccion" value="<?=(isset($form['direccion']) ? $form['direccion'] : "") ?>" placeholder="<?php _e("Introduce tu dirección", 'koollective'); ?>" />
                 </label>
               </div>
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-6">
                 <label>
                   <?php _e("Código postal", 'koollective'); ?> *
                   <input type="text" name="codigopostal" value="<?=(isset($form['codigopostal']) ? $form['codigopostal'] : "") ?>" placeholder="<?php _e("Introduce tu código postal", 'koollective'); ?>" maxlength="5" required />
                 </label>
               </div>
-              <div class="col-12 col-md-8">
+              <div class="col-12 col-md-6">
                 <label>
                   <?php _e("Cíudad", 'koollective'); ?> *
                   <input type="text" name="ciudad" value="<?=(isset($form['ciudad']) ? $form['ciudad'] : "") ?>" placeholder="<?php _e("Introduce tu ciudad", 'koollective'); ?>" required />
@@ -500,7 +502,10 @@ add_shortcode('kollective_inscripcion', function ($atts) {
             </div>
           </form>
         </div>
+       
       </div>
+        <div class="col-12  col-md-6 "> <img src="<?php echo get_stylesheet_directory_uri(); ?>/koollective-nuevo/images/detalle_form.png" class="w-100" alt="" />
+            </div>
     <script>
       jQuery('input[name="aceptorecibirinformacion"]').on('change', function() {
         if(jQuery(this).is(':checked')) {
@@ -509,6 +514,15 @@ add_shortcode('kollective_inscripcion', function ($atts) {
           jQuery('#metodorecibirinformacion').addClass('d-none');
         }
       });
+
+
+      jQuery('#forminscripcion button').click(function(e) {
+        console.log("CLICK");
+         jQuery('html, body').animate({
+              scrollTop:jQuery("#viewform").offset().top
+          }, 20);
+      });
+
     </script>
   <?php }
   return ob_get_clean(); // fin del nivel actual de buffer
